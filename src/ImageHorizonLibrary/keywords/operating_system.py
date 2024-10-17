@@ -2,10 +2,15 @@
 import shlex
 import subprocess
 
-from ..errors import OSException
+from ..modules.errors import OSException
 
 
-class _OperatingSystem(object):
+class OperatingSystemKeywords(object):
+    """
+    TODO Doc
+    """
+    def __init__(self, orchesterer):
+        self.orchesterer = orchesterer
 
     def launch_application(self, app, alias=None):
         '''Launches an application.
@@ -20,10 +25,10 @@ class _OperatingSystem(object):
         enclose the command with double quotes:
 
         | Launch Application | "C:\\my folder\\myprogram.exe" | # Needs quotes       ||||
-        | Launch Application | myprogram.exe                  | # No need for quotes ||||
-        | Launch Application | myprogram.exe                  | arg1 | arg2 | # Program with arguments ||
-        | Launch Application | myprogram.exe                  | alias=myprog | # Program with alias |||
-        | Launch Application | myprogram.exe                  | arg1 | arg2 | alias=myprog | # Program with arguments and alias |
+        | Launch Application | myprogram.exe | # No need for quotes ||||
+        | Launch Application | myprogram.exe | arg1 | arg2 | # Program with arguments ||
+        | Launch Application | myprogram.exe | alias=myprog | # Program with alias |||
+        | Launch Application | myprogram.exe | arg1 | arg2 | alias=myprog | # Program with arguments and alias |
 
         Returns automatically generated alias which can be used with `Terminate
         Application`.
@@ -32,9 +37,9 @@ class _OperatingSystem(object):
         yourself.
         '''
         if not alias:
-            alias = str(len(self.open_applications))
+            alias = str(len(self.orchesterer.open_applications))
         process = subprocess.Popen(shlex.split(app))
-        self.open_applications[alias] = process
+        self.orchesterer.open_applications[alias] = process
         return alias
 
     def terminate_application(self, alias=None):
@@ -44,13 +49,13 @@ class _OperatingSystem(object):
         If no ``alias`` is given, terminates the last process that was
         launched.
         '''
-        if alias and alias not in self.open_applications:
-            raise OSException('Invalid alias "%s".' % alias)
-        process = self.open_applications.pop(alias, None)
+        if alias and alias not in self.orchesterer.open_applications:
+            raise OSException(f'Invalid alias "{alias}".')
+        process = self.orchesterer.open_applications.pop(alias, None)
         if not process:
             try:
-                _, process = self.open_applications.popitem()
-            except KeyError:
+                _, process = self.orchesterer.open_applications.popitem()
+            except KeyError as e:
                 raise OSException('`Terminate Application` called without '
-                                  '`Launch Application` called first.')
+                                  '`Launch Application` called first.') from e
         process.terminate()

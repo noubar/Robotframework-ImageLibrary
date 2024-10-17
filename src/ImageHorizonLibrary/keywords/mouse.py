@@ -1,14 +1,11 @@
 # -*- coding: utf-8 -*-
 import pyautogui as ag
 
-from ..errors import MouseException
+from ..modules.errors import MouseException
+from ..modules.interaction.mouse import Mouse
 
+class MouseKeywords(object):
 
-class _Mouse(object):
-
-    def _click_to_the_direction_of(self, direction, location, offset,
-                                   clicks, button, interval):
-        raise NotImplementedError('This is defined in the main class.')
 
     def click_to_the_above_of(self, location, offset, clicks=1,
                               button='left', interval=0.0):
@@ -32,7 +29,7 @@ class _Mouse(object):
         | @{coordinates}=       | Create List        | ${600}   | ${500} |
         | Click To The Above Of | ${coordinates}     | 100      |        |
         '''
-        self._click_to_the_direction_of('up', location, offset,
+        Mouse.click_to_the_direction_of('up', location, offset,
                                         clicks, button, interval)
 
     def click_to_the_below_of(self, location, offset, clicks=1,
@@ -41,7 +38,7 @@ class _Mouse(object):
 
         See argument documentation in `Click To The Above Of`.
         '''
-        self._click_to_the_direction_of('down', location, offset,
+        Mouse.click_to_the_direction_of('down', location, offset,
                                         clicks, button, interval)
 
     def click_to_the_left_of(self, location, offset, clicks=1,
@@ -50,7 +47,7 @@ class _Mouse(object):
 
         See argument documentation in `Click To The Above Of`.
         '''
-        self._click_to_the_direction_of('left', location, offset,
+        Mouse.click_to_the_direction_of('left', location, offset,
                                         clicks, button, interval)
 
     def click_to_the_right_of(self, location, offset, clicks=1,
@@ -59,7 +56,7 @@ class _Mouse(object):
 
         See argument documentation in `Click To The Above Of`.
         '''
-        self._click_to_the_direction_of('right', location, offset,
+        Mouse.click_to_the_direction_of('right', location, offset,
                                         clicks, button, interval)
 
     def move_to(self, *coordinates):
@@ -78,20 +75,7 @@ class _Mouse(object):
         X grows from left to right and Y grows from top to bottom, which means
         that top left corner of the screen is (0, 0)
         '''
-        if len(coordinates) > 2 or (len(coordinates) == 1 and
-                                    type(coordinates[0]) not in (list, tuple)):
-            raise MouseException('Invalid number of coordinates. Please give '
-                                 'either (x, y) or x, y.')
-        if len(coordinates) == 2:
-            coordinates = (coordinates[0], coordinates[1])
-        else:
-            coordinates = coordinates[0]
-        try:
-            coordinates = [int(coord) for coord in coordinates]
-        except ValueError:
-            raise MouseException('Coordinates %s are not integers' %
-                                 (coordinates,))
-        ag.moveTo(*coordinates)
+        Mouse.move_to(*coordinates)
 
     def mouse_down(self, button='left'):
         '''Presses specidied mouse button down'''

@@ -1,26 +1,28 @@
 # -*- coding: utf-8 -*-
 from os.path import abspath, relpath, join as path_join
-from random import choice
-from string import ascii_lowercase
-
 import pyautogui as ag
 from robot.libraries.BuiltIn import BuiltIn, RobotNotRunningError
 from robot.api import logger as LOGGER
 
-from ..errors import ScreenshotFolderException
+from ..modules.errors import ScreenshotFolderException
 
 
-class _Screenshot(object):
+class ScreenshotKeywords():
+    """
+    TODO Doc
+    """
+    def __init__(self, screenshots):
+        self.screenshots = screenshots
+
     def _make_up_filename(self):
         try:
-            path = BuiltIn().get_variable_value('${SUITE NAME}')
-            path = '%s-screenshot' % path.replace(' ', '')
+            path = f'{self.screenshots.name.replace(' ', '')}-screenshot'
         except RobotNotRunningError:
             LOGGER.info('Could not get suite name, using '
                         'default naming scheme')
             path = 'ImageHorizon-screenshot'
-        path = '%s-%d.png' % (path, self.screenshot_counter)
-        self.screenshot_counter += 1
+        path = f'{path}-{self.screenshots.counter}.png'
+        self.screenshots.counter += 1
         return path
 
     def take_a_screenshot(self):
@@ -37,10 +39,10 @@ class _Screenshot(object):
         Framework execution, file name is this library's name with running
         integer appended.
         '''
-        target_dir = self.screenshot_folder if self.screenshot_folder else ''
+        target_dir = self.screenshots.folder if self.screenshots.folder else ''
         if not isinstance(target_dir, str):
             raise ScreenshotFolderException('Screenshot folder is invalid: '
-                                            '"%s"' % target_dir)
+                                            f'"{target_dir}"' )
         path = self._make_up_filename()
         path = abspath(path_join(target_dir, path))
         logpath = BuiltIn().get_variable_value('${OUTPUT DIR}')

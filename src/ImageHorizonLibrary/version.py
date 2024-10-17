@@ -1,2 +1,2 @@
 # -*- coding: utf-8 -*-
-VERSION = '1.1-edge'
+VERSION = '2.0.0'
