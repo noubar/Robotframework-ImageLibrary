@@ -239,7 +239,7 @@ class _RecognizeImages(object):
 
         Fails if image is not found on screen.
 
-        Returns Python tuple ``(x, y)`` of the coordinates.
+        Returns Python tuple ``(x, y)`` of the coordinates matching the center point of the reference image.
         '''
         return self._locate(reference_image)
 
@@ -253,7 +253,7 @@ class _RecognizeImages(object):
 
         ``timeout`` is given in whole seconds.
 
-        Returns Python tuple ``(x, y)`` of the coordinates.
+        Returns Python tuple ``(x, y)`` of the coordinates matching the center point of the reference image.
         '''
         stop_time = int(time()) + int(timeout)
         location = None
