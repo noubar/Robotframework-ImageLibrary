@@ -1,10 +1,14 @@
-# -*- coding: utf-8 -*-
+import sys
+import os
 from unittest import TestCase
 from mock import call, MagicMock, patch
-
+srcPath = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(srcPath)
 
 class TestMouse(TestCase):
-
+    """
+    Test every methode under modules.mouse
+    """
     def setUp(self):
         self.mock = MagicMock()
         self.patcher = patch.dict('sys.modules', {'pyautogui': self.mock})

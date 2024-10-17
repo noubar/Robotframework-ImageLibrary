@@ -1,8 +1,10 @@
-# -*- coding: utf-8 -*-
+import sys
+import os
 from unittest import TestCase
-
 from mock import MagicMock, patch
 
+srcPath = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(srcPath)
 
 class TestOperatingSystem(TestCase):
     def setUp(self):

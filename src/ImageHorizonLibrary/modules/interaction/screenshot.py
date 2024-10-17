@@ -1,29 +1,27 @@
-# -*- coding: utf-8 -*-
 from os.path import abspath, relpath, join as path_join
-from random import choice
-from string import ascii_lowercase
-
-import pyautogui as ag
 from robot.libraries.BuiltIn import BuiltIn, RobotNotRunningError
 from robot.api import logger as LOGGER
+import pyautogui as ag
 
 from ..errors import ScreenshotFolderException
 
+class Screenshot:
 
-class _Screenshot(object):
+    def __init__(self, screenshots):
+        self.screenshots = screenshots
+
     def _make_up_filename(self):
         try:
-            path = BuiltIn().get_variable_value('${SUITE NAME}')
-            path = '%s-screenshot' % path.replace(' ', '')
+            path = f'{self.screenshots.name.replace(' ', '')}-screenshot'
         except RobotNotRunningError:
             LOGGER.info('Could not get suite name, using '
                         'default naming scheme')
             path = 'ImageHorizon-screenshot'
-        path = '%s-%d.png' % (path, self.screenshot_counter)
-        self.screenshot_counter += 1
+        path = f'{path}-{self.screenshots.counter}.png'
+        self.screenshots.counter += 1
         return path
 
-    def take_a_screenshot(self):
+    def take_a_screenshot(self, allscreens: bool):
         '''Takes a screenshot of the screen.
 
         This keyword is run on failure if it is not overwritten when
@@ -37,14 +35,14 @@ class _Screenshot(object):
         Framework execution, file name is this library's name with running
         integer appended.
         '''
-        target_dir = self.screenshot_folder if self.screenshot_folder else ''
+        target_dir = self.screenshots.folder if self.screenshots.folder else ''
         if not isinstance(target_dir, str):
             raise ScreenshotFolderException('Screenshot folder is invalid: '
-                                            '"%s"' % target_dir)
+                                            f'"{target_dir}"' )
         path = self._make_up_filename()
         path = abspath(path_join(target_dir, path))
         logpath = BuiltIn().get_variable_value('${OUTPUT DIR}')
         relativepath = relpath(path, start=logpath).replace('\\', '\/')
-        LOGGER.info('Screenshot taken: {0}<br/><img src="{0}" '
-                    'width="100%" />'.format(relativepath), html=True)
-        ag.screenshot(path)
+        LOGGER.info('Screenshot taken: '
+                    '{0}<br/><img src="{0}" width="100%" />'.format(relativepath), html=True)
+        ag.screenshot(path, allscreens)

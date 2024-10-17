@@ -1,10 +1,11 @@
-# -*- coding: utf-8 -*-
+import sys
 import time
 
 from unittest import TestCase
 from os.path import abspath, dirname, join as path_join
 from mock import call, MagicMock, patch, ANY
-
+srcPath = dirname(dirname(dirname(abspath(__file__))))
+sys.path.append(srcPath)
 CURDIR = abspath(dirname(__file__))
 TESTIMG_DIR = path_join(CURDIR, 'reference_images')
 

@@ -8,7 +8,9 @@ from unittest import TestCase
 
 from mock import patch, MagicMock
 from robot.libraries.BuiltIn import BuiltIn
-
+import sys
+srcPath = dirname(dirname(dirname(abspath(__file__))))
+sys.path.append(srcPath)
 CURDIR = abspath(dirname(__file__))
 
 

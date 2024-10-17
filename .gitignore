@@ -12,3 +12,6 @@ log.html
 /lib
 *egg-info
 test_*
+build
+dist
+.vscode/launch.json

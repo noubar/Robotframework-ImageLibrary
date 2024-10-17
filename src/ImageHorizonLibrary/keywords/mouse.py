@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
 import pyautogui as ag
+from ..modules.interaction.mouse import Mouse
+from robot.api.deco import keyword
 
-from ..errors import MouseException
+class MouseKeywords(object):
 
+    def __init__(self):
+        self.module = Mouse
 
-class _Mouse(object):
-
-    def _click_to_the_direction_of(self, direction, location, offset,
-                                   clicks, button, interval):
-        raise NotImplementedError('This is defined in the main class.')
-
+    @keyword
     def click_to_the_above_of(self, location, offset, clicks=1,
                               button='left', interval=0.0):
         '''Clicks above of given location by given offset.
@@ -32,36 +31,40 @@ class _Mouse(object):
         | @{coordinates}=       | Create List        | ${600}   | ${500} |
         | Click To The Above Of | ${coordinates}     | 100      |        |
         '''
-        self._click_to_the_direction_of('up', location, offset,
+        self.module.click_to_the_direction_of('up', location, offset,
                                         clicks, button, interval)
 
+    @keyword
     def click_to_the_below_of(self, location, offset, clicks=1,
                               button='left', interval=0.0):
         '''Clicks below of given location by given offset.
 
         See argument documentation in `Click To The Above Of`.
         '''
-        self._click_to_the_direction_of('down', location, offset,
+        self.module.click_to_the_direction_of('down', location, offset,
                                         clicks, button, interval)
 
+    @keyword
     def click_to_the_left_of(self, location, offset, clicks=1,
                              button='left', interval=0.0):
         '''Clicks left of given location by given offset.
 
         See argument documentation in `Click To The Above Of`.
         '''
-        self._click_to_the_direction_of('left', location, offset,
+        self.module.click_to_the_direction_of('left', location, offset,
                                         clicks, button, interval)
 
+    @keyword
     def click_to_the_right_of(self, location, offset, clicks=1,
                               button='left', interval=0.0):
         '''Clicks right of given location by given offset.
 
         See argument documentation in `Click To The Above Of`.
         '''
-        self._click_to_the_direction_of('right', location, offset,
+        self.module.click_to_the_direction_of('right', location, offset,
                                         clicks, button, interval)
 
+    @keyword
     def move_to(self, *coordinates):
         '''Moves the mouse pointer to an absolute coordinates.
 
@@ -78,37 +81,28 @@ class _Mouse(object):
         X grows from left to right and Y grows from top to bottom, which means
         that top left corner of the screen is (0, 0)
         '''
-        if len(coordinates) > 2 or (len(coordinates) == 1 and
-                                    type(coordinates[0]) not in (list, tuple)):
-            raise MouseException('Invalid number of coordinates. Please give '
-                                 'either (x, y) or x, y.')
-        if len(coordinates) == 2:
-            coordinates = (coordinates[0], coordinates[1])
-        else:
-            coordinates = coordinates[0]
-        try:
-            coordinates = [int(coord) for coord in coordinates]
-        except ValueError:
-            raise MouseException('Coordinates %s are not integers' %
-                                 (coordinates,))
-        ag.moveTo(*coordinates)
+        self.module.move_to(*coordinates)
 
+    @keyword
     def mouse_down(self, button='left'):
         '''Presses specidied mouse button down'''
         ag.mouseDown(button=button)
 
+    @keyword
     def mouse_up(self, button='left'):
         '''Releases specified mouse button'''
         ag.mouseUp(button=button)
 
-    def click(self, button='left'):
+    @keyword
+    def click_to(self, x, y, button='left'):
         '''Clicks with the specified mouse button.
 
         Valid buttons are ``left``, ``right`` or ``middle``.
         '''
-        ag.click(button=button)
+        ag.click(x, y, button=button)
 
-    def double_click(self, button='left', interval=0.0):
+    @keyword
+    def double_click_to(self, x, y, button='left', interval=0.0):
         '''Double clicks with the specified mouse button.
 
         See documentation of ``button`` in `Click`.
@@ -116,13 +110,14 @@ class _Mouse(object):
         ``interval`` specifies the time between clicks and should be
         floating point number.
         '''
-        ag.doubleClick(button=button, interval=float(interval))
+        ag.doubleClick(x, y, button=button, interval=float(interval))
 
-    def triple_click(self, button='left', interval=0.0):
+    @keyword
+    def triple_click_to(self, x, y, button='left', interval=0.0):
         '''Triple clicks with the specified mouse button.
 
         See documentation of ``button`` in `Click`.
 
         See documentation of ``interval`` in `Double Click`.
         '''
-        ag.tripleClick(button=button, interval=float(interval))
+        ag.tripleClick(x, y, button=button, interval=float(interval))

@@ -16,7 +16,7 @@ class UILocatorController:
         self.model = UILocatorModel()
         self.image_horizon_instance = image_horizon_instance
         self.view = UILocatorView(self, self.image_container, self.image_horizon_instance)
-        
+
     def main(self):
         self.init_view()
         self.view.main()
@@ -36,8 +36,8 @@ class UILocatorController:
         self.view.hint_msg.set("Ready")
         self.view.processing_done = False
 
-    def help(self):
-        webbrowser.open("https://eficode.github.io/robotframework-imagehorizonlibrary/doc/ImageHorizonLibrary.html")
+    # def help(self):
+    #     webbrowser.open("https://eficode.github.io/robotframework-imagehorizonlibrary/doc/ImageHorizonLibrary.html")
 
     def load_needle_image_names(self, combobox=None):
         os.chdir(self.image_horizon_instance.reference_folder)

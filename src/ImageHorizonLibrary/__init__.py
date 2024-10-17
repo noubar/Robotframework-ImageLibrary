@@ -1,51 +1,63 @@
 # -*- coding: utf-8 -*-
-from collections import OrderedDict
 from contextlib import contextmanager
-import inspect
+from robotlibcore import DynamicCore
 
-from .errors import *    # import errors before checking dependencies!
+from .modules.errors import *    # import errors before checking dependencies!
 
 try:
     import pyautogui as ag
-except ImportError:
+except ImportError as e:
     raise ImageHorizonLibraryError('There is something wrong with pyautogui or '
-                                   'it is not installed.')
-
+                                   'it is not installed.') from e
 try:
     from robot.api import logger as LOGGER
     from robot.libraries.BuiltIn import BuiltIn
-except ImportError:
+except ImportError as e:
     raise ImageHorizonLibraryError('There is something wrong with '
-                                   'Robot Framework or it is not installed.')
-
+                                   'Robot Framework or it is not installed.') from e
 try:
     from tkinter import Tk as TK
-except ImportError:
+except ImportError as e:
     raise ImageHorizonLibraryError('There is either something wrong with '
                                    'Tkinter or you are running this on Java, '
                                    'which is not a supported platform. Please '
-                                   'use Python and verify that Tkinter works.')
-
+                                   'use Python and verify that Tkinter works.') from e
 try:
-    import skimage as sk
-except ImportError: 
+    import skimage
+except ImportError as e:
     raise ImageHorizonLibraryError('There is either something wrong with skimage '
-                                    '(scikit-image) or it is not installed.')
+                                    '(scikit-image) or it is not installed.') from e
+try:
+    import cv2
+except ImportError as e:
+    raise ImageHorizonLibraryError('There is either something wrong with cv2 '
+                                    '(opencv-python) or it is not installed.') from e
 
-from . import utils
-from .interaction import *
-from .recognition import *
+from .keywords import(KeyboardKeywords,
+                      ScreenshotKeywords,
+                      OperatingSystemKeywords,
+                      RecognizeImagesKeywords,
+                      OrganizeKeywords,
+                      MouseKeywords)
+
+from .modules.utils import *
 from .version import VERSION
+from .modules.orchestrer import Orchesterer
 
 __version__ = VERSION
 
-class ImageHorizonLibrary(_Keyboard, _Mouse, _OperatingSystem, _RecognizeImages, _Screenshot):
-    '''A cross-platform Robot Framework library for GUI automation.
+class ImageHorizonLibrary(DynamicCore):
+    """A cross-platform Robot Framework library for GUI automation.
 
     *Key features*: 
-    - Automates *keyboard and mouse actions* on the screen (based on [https://pyautogui.readthedocs.org|pyautogui]).
-    - The regions to execute these actions on (buttons, sliders, input fields etc.) are determined by `reference images` which the library detects on the screen - independently of the OS or the application type.
-    - Two different image `recognition strategies`: `default` (fast and reliable of predictable screen content), and `edge` (to facilitate the recognition of unpredictable pixel deviations)
+    - Automates *keyboard and mouse actions* on the screen 
+    (based on [https://pyautogui.readthedocs.org|pyautogui]).
+    - The regions to execute these actions on (buttons, sliders, input fields etc.) 
+    are determined by `reference images` which the library detects on the screen -
+    independently of the OS or the application type.
+    - Two different image `recognition strategies`: `default` 
+    (fast and reliable of predictable screen content),
+    and `edge` (to facilitate the recognition of unpredictable pixel deviations)
     - The library can also take screenshots in case of failure or by intention.
 
     = Image Recognition = 
@@ -105,7 +117,8 @@ class ImageHorizonLibrary(_Keyboard, _Mouse, _OperatingSystem, _RecognizeImages,
     
     === Default image detection strategy ===
     
-    If imported without any strategy argument, the library uses [https://pyautogui.readthedocs.org|pyautogui] 
+    If imported without any strategy argument, the library uses 
+    [https://pyautogui.readthedocs.org|pyautogui] 
     under the hood to recognize images on the screen. 
     This is the perfect choice to start writing tests. 
 
@@ -139,18 +152,27 @@ class ImageHorizonLibrary(_Keyboard, _Mouse, _OperatingSystem, _RecognizeImages,
     image) *to the essential characteristics* and then *compare _those_ images*. 
 
     "Essential characteristics" of an image are those areas where neighbouring pixels show a 
-    sharp change of brightness, better known as "edges". [https://en.wikipedia.org/wiki/Edge_detection|Edge detection] 
-    is the process of finding the edges in an image, done by [https://scikit-image.org/|scikit-image] in this library.
+    sharp change of brightness, better known as "edges". 
+    [https://en.wikipedia.org/wiki/Edge_detection|Edge detection] 
+    is the process of finding the edges in an image, done by 
+    [https://scikit-image.org/|scikit-image] in this library.
     
     As a brief digression, edge detection is a multi-step process:
 
-    - apply a [https://en.wikipedia.org/wiki/Gaussian_filter|Gaussian filter] (blurs the image to remove noise; intensity set by parameter `sigma`)
-    - apply a [https://en.wikipedia.org/wiki/Sobel_operator|Sobel filter] (remove non-max pixels, get a 1 pixel edge curve) 
-    - separate weak edges from strong ones with [https://en.wikipedia.org/wiki/Canny_edge_detector#Edge_tracking_by_hysteresis|hysteresis] 
-    - apply the `template_matching` routine to get a [https://en.wikipedia.org/wiki/Cross-correlation|cross correlation] matrix of values from -1 (no correlation) to +1 (perfect correlation).
-    - Filter out only those coordinates with values greater than the ``confidence`` level, take the max
+    - apply a [https://en.wikipedia.org/wiki/Gaussian_filter|Gaussian filter] 
+    (blurs the image to remove noise; intensity set by parameter `sigma`)
+    - apply a [https://en.wikipedia.org/wiki/Sobel_operator|Sobel filter] 
+    (remove non-max pixels, get a 1 pixel edge curve) 
+    - separate weak edges from strong ones with 
+    [https://en.wikipedia.org/wiki/Canny_edge_detector#Edge_tracking_by_hysteresis|hysteresis] 
+    - apply the `template_matching` routine to get a 
+    [https://en.wikipedia.org/wiki/Cross-correlation|cross correlation] 
+    matrix of values from -1 (no correlation) to +1 (perfect correlation).
+    - Filter out only those coordinates with values greater than the ``confidence`` level, 
+    take the max
 
-    The keyword `Debug Image` opens a debugger UI where confidence level, Gaussian sigma and low/high thresholds can be tested and adjusted to individual needs.
+    The keyword `Debug Image` opens a debugger UI where confidence level, 
+    Gaussian sigma and low/high thresholds can be tested and adjusted to individual needs.
 
     Edge detection costs some extra CPU time; you should always first try 
     to use the ``default`` strategy and only selectively switch to ``edge``
@@ -159,9 +181,11 @@ class ImageHorizonLibrary(_Keyboard, _Mouse, _OperatingSystem, _RecognizeImages,
     | # use with defaults
     | Set Strategy  edge
     | # use with custom parameters
-    | Set Strategy  edge  edge_sigma=2.0  edge_low_threshold=0.1  edge_high_threshold=0.3  confidence=0.8
+    | Set Strategy  edge  edge_sigma=2.0  edge_low_threshold=0.1  
+    edge_high_threshold=0.3  confidence=0.8
 
-    To use strategy ``edge``, the [https://scikit-image.org|scikit-image] Python package must be installed separately:
+    To use strategy ``edge``, the [https://scikit-image.org|scikit-image] 
+    Python package must be installed separately:
 
     | $ pip install scikit-image
 
@@ -181,16 +205,18 @@ class ImageHorizonLibrary(_Keyboard, _Mouse, _OperatingSystem, _RecognizeImages,
 
     | ${location}=           | `Wait For`  | label Name |
     | `Click To The Left Of` | ${location} | 200        |
-    '''    
+    """    
 
-    ROBOT_LIBRARY_SCOPE = 'TEST SUITE'
+    ROBOT_LIBRARY_SCOPE = 'Global'
     ROBOT_LIBRARY_VERSION = VERSION
+    ROBOT_LISTENER_API_VERSION = 2
 
     def __init__(self, reference_folder=None, screenshot_folder=None,
                  keyword_on_failure='ImageHorizonLibrary.Take A Screenshot',
-                 confidence=None, strategy='default', 
-                 edge_sigma=2.0, edge_low_threshold=0.1, edge_high_threshold=0.3):
-        '''ImageHorizonLibrary can be imported with several options.
+                 confidence=0.99, strategy='default',
+                 edge_sigma=2.0, edge_low_threshold=0.1, edge_high_threshold=0.3,
+                 recognition_timeout=0):
+        """ImageHorizonLibrary can be imported with several options.
         
         ``reference_folder`` is path to the folder where all reference images
         are stored. It must be a _valid absolute path_. As the library
@@ -214,205 +240,44 @@ class ImageHorizonLibrary(_Keyboard, _Mouse, _OperatingSystem, _RecognizeImages,
           - ``edge_sigma`` - Gaussian blur intensity
           - ``edge_low_threshold`` - low pixel gradient threshold
           - ``edge_high_threshold`` - high pixel gradient threshold
-        '''
-                
-        # _RecognizeImages.set_strategy(self, strategy)
-        self.reference_folder = reference_folder
-        self.screenshot_folder = screenshot_folder
-        self.keyword_on_failure = keyword_on_failure
-        self.open_applications = OrderedDict()
-        self.screenshot_counter = 1
-        self.is_windows = utils.is_windows()
-        self.is_mac = utils.is_mac()
-        self.is_linux = utils.is_linux()
-        self.has_retina = utils.has_retina()
-        self.has_cv = utils.has_cv()
-        self.has_skimage = utils.has_skimage()
-        self.confidence = confidence
-        self.initial_confidence = confidence
-        self._class_bases = inspect.getmro(self.__class__)
-        self.set_strategy(strategy, self.confidence)
-        self.edge_sigma = edge_sigma
-        self.edge_low_threshold = edge_low_threshold
-        self.edge_high_threshold = edge_high_threshold
 
-
-
-    def set_strategy(self, strategy, edge_sigma=2.0, edge_low_threshold=0.1, edge_high_threshold=0.3, confidence=None):
-        '''Changes the way how images are detected on the screen. This can also be done globally during `Importing`.
-        Strategies:
-        - ``default``
-        - ``edge`` - Advanced image recognition options with canny edge detection
-
-        The ``edge`` strategy allows these additional parameters:
-          - ``edge_sigma`` - Gaussian blur intensity
-          - ``edge_low_threshold`` - low pixel gradient threshold
-          - ``edge_high_threshold`` - high pixel gradient threshold
-
-        Both strategies can optionally be initialized with a new confidence.'''
-
-        self.strategy = strategy
-        if strategy == 'default':
-            self.strategy_instance = _StrategyPyautogui(self)
-        elif strategy == 'edge': 
-            self.strategy_instance = _StrategySkimage(self)
-            self.edge_sigma = edge_sigma
-            self.edge_low_threshold = edge_low_threshold
-            self.edge_high_threshold = edge_high_threshold
-        else: 
-            raise StrategyException('Invalid strategy: "%s"' % strategy)
-            
-        if not confidence is None:
-            self.set_confidence(confidence)
-
-        # Linking protected _try_locate to the strategy's method
-        self._try_locate = self.strategy_instance._try_locate       
+        ``recognition_timeout`` default timout in seconds for image recognition.
+          
+        """
+        self.platform = Orchesterer.Platform()
+        self.defaults = Orchesterer.Defaults(reference_folder, keyword_on_failure)
+        self.screenshots = Orchesterer.Screenshots(screenshot_folder)
+        self.recognitions = Orchesterer.Recognitions(confidence, strategy, edge_sigma,
+                                                        edge_low_threshold, edge_high_threshold,
+                                                        recognition_timeout)
         
-    def _get_location(self, direction, location, offset):
-        x, y = location
-        offset = int(offset)
-        if direction == 'left':
-            x = x - offset
-        if direction == 'up':
-            y = y - offset
-        if direction == 'right':
-            x = x + offset
-        if direction == 'down':
-            y = y + offset
-        return x, y
+        libraries = [KeyboardKeywords(),
+                    MouseKeywords(),
+                    ScreenshotKeywords(self.screenshots),
+                    OperatingSystemKeywords(self.defaults, self.platform),
+                    RecognizeImagesKeywords(self.defaults, self.platform, self.recognitions),
+                    OrganizeKeywords(self.defaults, self.platform, self.recognitions, self.screenshots)
+                    ]
+        DynamicCore.__init__(self, libraries)
 
-    def _click_to_the_direction_of(self, direction, location, offset,
-                                   clicks, button, interval):
-        x, y = self._get_location(direction, location, offset)
+    def run_keyword(self, name, args, kwargs=None):
         try:
-            clicks = int(clicks)
-        except ValueError:
-            raise MouseException('Invalid argument "%s" for `clicks`')
-        if button not in ['left', 'middle', 'right']:
-            raise MouseException('Invalid button "%s" for `button`')
-        try:
-            interval = float(interval)
-        except ValueError:
-            raise MouseException('Invalid argument "%s" for `interval`')
+            return DynamicCore.run_keyword(self, name, args, kwargs)
+        except Exception:
+            # if self.defaults.keyword_on_failure:
+            #     self._run_on_failure()
+            raise
 
-        LOGGER.info('Clicking %d time(s) at (%d, %d) with '
-                    '%s mouse button at interval %f' % (clicks, x, y,
-                                                        button, interval))
-        ag.click(x, y, clicks=clicks, button=button, interval=interval)
+    # def _run_on_failure(self):
+    #     if not self.defaults.keyword_on_failure:
+    #         return
+    #     try:
+    #         BuiltIn().run_keyword(self.defaults.keyword_on_failure)
+    #     except Exception as e:
+    #         LOGGER.debug(e)
+    #         LOGGER.warn('Failed to run keyword_on_failure in imagelibrary.'
+    #                     'Is Robot Framework running')
 
-    def _convert_to_valid_special_key(self, key):
-        key = str(key).lower()
-        if key.startswith('key.'):
-            key = key.split('key.', 1)[1]
-        elif len(key) > 1:
-            return None
-        if key in ag.KEYBOARD_KEYS:
-            return key
-        return None
-
-    def _validate_keys(self, keys):
-        valid_keys = []
-        for key in keys:
-            valid_key = self._convert_to_valid_special_key(key)
-            if not valid_key:
-                raise KeyboardException('Invalid keyboard key "%s", valid '
-                                        'keyboard keys are:\n%r' %
-                                        (key, ', '.join(ag.KEYBOARD_KEYS)))
-            valid_keys.append(valid_key)
-        return valid_keys
-
-    def _press(self, *keys, **options):
-        keys = self._validate_keys(keys)
-        ag.hotkey(*keys, **options)
-
-    @contextmanager
-    def _tk(self):
-        tk = TK()
-        yield tk.clipboard_get()
-        tk.destroy()
-
-    def copy(self):
-        '''Executes ``Ctrl+C`` on Windows and Linux, ``⌘+C`` on OS X and
-        returns the content of the clipboard.'''
-        key = 'Key.command' if self.is_mac else 'Key.ctrl'
-        self._press(key, 'c')
-        return self.get_clipboard_content()
-
-    def get_clipboard_content(self):
-        '''Returns what is currently copied in the system clipboard.'''
-        with self._tk() as clipboard_content:
-            return clipboard_content
-
-    def pause(self):
-        '''Shows a dialog that must be dismissed with manually clicking.
-
-        This is mainly for when you are developing the test case and want to
-        stop the test execution.
-
-        It should probably not be used otherwise.
-        '''
-        ag.alert(text='Test execution paused.', title='Pause',
-                 button='Continue')
-
-    def _run_on_failure(self):
-        if not self.keyword_on_failure:
-            return
-        try:
-            BuiltIn().run_keyword(self.keyword_on_failure)
-        except Exception as e:
-            LOGGER.debug(e)
-            LOGGER.warn('Failed to take a screenshot. '
-                        'Is Robot Framework running?')
-
-    def set_keyword_on_failure(self, keyword_on_failure):
-        '''Sets keyword to be run, when location-related
-        keywords fail.
-
-        This keyword might be used to temporarily diable screenshots, then re-enable them later in the test.
-
-        See `library importing` for he usage of keyword_on_failure.
-        '''
-        self.keyword_on_failure = keyword_on_failure
-
-    def set_reference_folder(self, reference_folder_path):
-        '''Sets where all reference images are stored.
-
-        See `library importing` for format of the reference folder path.
-        '''
-        self.reference_folder = reference_folder_path
-
-    def set_screenshot_folder(self, screenshot_folder_path):
-        '''Sets the folder where screenshots are saved to.
-
-        See `library importing` for more specific information.
-        '''
-        self.screenshot_folder = screenshot_folder_path
-
-    def reset_confidence(self):
-        '''Resets the confidence level to the library default.
-        If no confidence was given during import, this is None.'''
-        LOGGER.info('Resetting confidence level to {}.'.format(self.initial_confidence))
-        self.confidence = self.initial_confidence
-        
-    def set_confidence(self, new_confidence):
-        '''Sets the accuracy when finding images.
-
-        ``new_confidence`` is a decimal number between 0 and 1 inclusive.
-
-        See `Confidence level` about additional dependencies that needs to be
-        installed before this keyword has any effect.
-        '''
-        if new_confidence is not None:
-            try:
-                new_confidence = float(new_confidence)
-                if not 1 >= new_confidence >= 0:
-                    LOGGER.warn('Unable to set confidence to {}. Value '
-                                'must be between 0 and 1, inclusive.'
-                                .format(new_confidence))
-                else:
-                    self.confidence = new_confidence
-            except TypeError as err:
-                LOGGER.warn("Can't set confidence to {}".format(new_confidence))
-        else:
-            self.confidence = None
-
+    # def _start_test(self, name, attrs):  # pylint: disable=unused-argument
+    #       self.screenshots.set_name(name)
+    #       self.screenshots.counter = 1

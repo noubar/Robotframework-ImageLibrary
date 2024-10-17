@@ -1,7 +1,27 @@
-# -*- coding: utf-8 -*-
+import unittest
+import sys
+import os
 from unittest import TestCase
-from mock import patch, MagicMock
+from unittest import mock
+import threading
+from time import time
 
+# from mock import patch, MagicMock
+srcPath = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(srcPath) 
+from src.ImageHorizonLibrary.modules.errors import KeyboardException
+from src.ImageHorizonLibrary.modules.interaction.keyboard import Keyboard
+
+
+class FuncThread(threading.Thread):
+    def __init__(self, func, *args):
+        super(FuncThread, self).__init__()
+        self.args = args
+        self.func = func
+
+    def run(self):
+        time.sleep(0.25)  # NOTE: BE SURE TO ACCOUNT FOR THIS QUARTER SECOND FOR TIMING TESTS!
+        self.func(self.args)
 
 KEYBOARD_KEYS = [
     '\\t', '\\n', '\\r', ' ', '!', '"', '#', '$', '%', '&', "'", '(',
@@ -29,63 +49,91 @@ KEYBOARD_KEYS = [
 ]
 
 class TestKeyboard(TestCase):
+    """
+    Test every methode under modules.keyboard
+    """
     def setUp(self):
-        self.mock = MagicMock()
-        self.mock.KEYBOARD_KEYS = KEYBOARD_KEYS
-        self.patcher = patch.dict('sys.modules', {'pyautogui': self.mock})
+        self.mock = mock.MagicMock()
+        self.keys = KEYBOARD_KEYS
+        self.patcher = mock.patch.dict('sys.modules', {'pyautogui': self.mock})
         self.patcher.start()
-        from ImageHorizonLibrary import ImageHorizonLibrary
-        self.lib = ImageHorizonLibrary()
+        self.module = Keyboard()
 
     def tearDown(self):
         self.mock.reset_mock()
         self.patcher.stop()
 
     def test_type_with_text(self):
-        self.lib.type('hey you fool')
+        """
+        TODO Doc
+        """
+        self.module.type('hey you fool')
         self.mock.typewrite.assert_called_once_with('hey you fool')
         self.mock.reset_mock()
 
-        self.lib.type('.')
+        self.module.type('.')
         self.mock.press.assert_called_once_with('.')
 
     def test_type_with_umlauts(self):
-        self.lib.type('öäöäü')
+        """
+        TODO Doc
+        """
+        self.module.type('öäöäü')
         self.mock.typewrite.assert_called_once_with('öäöäü')
 
     def test_type_with_text_and_keys(self):
-        self.lib.type('I love you', 'Key.ENTER')
+        """
+        TODO Doc
+        """
+        self.module.type('I love you', 'Key.ENTER')
         self.mock.typewrite.assert_called_once_with('I love you')
         self.mock.press.assert_called_once_with('enter')
 
     def test_type_with_utf8_keys(self):
-        self.lib.type('key.Tab')
+        """
+        TODO Doc
+        """
+        self.module.type('key.Tab')
         self.assertEqual(self.mock.typewrite.call_count, 0)
         self.mock.press.assert_called_once_with('tab')
         self.assertEqual(type(self.mock.press.call_args[0][0]),
                           type(str()))
 
     def test_type_with_keys_down(self):
-        self.lib.type_with_keys_down('hello', 'key.shift')
+        """
+        TODO Doc
+        """
+        self.module.type_with_keys_down('hello', 'key.shift')
         self.mock.keyDown.assert_called_once_with('shift')
         self.mock.typewrite.assert_called_once_with('hello')
         self.mock.keyUp.assert_called_once_with('shift')
 
     def test_type_with_keys_down_with_invalid_keys(self):
-        from ImageHorizonLibrary import KeyboardException
-
+        """
+        TODO Doc
+        """
         expected_msg = ('Invalid keyboard key "enter", valid keyboard keys '
-                        'are:\n%r' % ', '.join(self.mock.KEYBOARD_KEYS))
+                        f"are:\n{', '.join(self.keys)}")
         with self.assertRaises(KeyboardException) as cm:
-            self.lib.type_with_keys_down('sometext', 'enter')
+            self.module.type_with_keys_down('sometext', 'enter')
         self.assertEqual(str(cm.exception), expected_msg)
 
-    def test_press_combination(self):
-            self.lib.press_combination('Key.ctrl', 'A')
-            self.mock.hotkey.assert_called_once_with('ctrl', 'a')
+    @mock.patch('pyautogui.hotkey', create=True)
+    def test_press_combination(self, mock):
+        """
+        TODO Doc
+        """
+        self.module.press_combination( 'Key.ctrl', 'A')
+        # FuncThread(self.module.press_combination(), 'Key.ctrl', 'A')
+        mock.hotkey.assert_called_once_with('ctrl', 'a')
+        self.mock.reset_mock()
+        for key in self.keys:
+            self.module.press_combination(f'Key.{key}')
+            self.mock.hotkey.assert_called_once_with(key.lower())
             self.mock.reset_mock()
 
-            for key in self.mock.KEYBOARD_KEYS:
-                self.lib.press_combination('Key.%s' % key)
-                self.mock.hotkey.assert_called_once_with(key.lower())
-                self.mock.reset_mock()
+if __name__ == "__main__":
+    suite = unittest.TestSuite()
+    suite.addTest(TestKeyboard("test_press_combination"))
+    runner = unittest.TextTestRunner()
+    runner.run(suite)

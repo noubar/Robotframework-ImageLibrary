@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
+import sys
 import shlex
 
 from os.path import abspath, dirname, join as path_join
@@ -9,8 +10,10 @@ from warnings import warn
 
 from mock import MagicMock, patch
 
+srcPath = dirname(dirname(dirname(abspath(__file__))))
+sys.path.append(srcPath)
 
-SRCDIR = path_join(abspath(dirname(__file__)), '..', '..', 'src')
+SRCDIR = path_join(srcPath, 'src')
 
 
 class TestMainClass(TestCase):
