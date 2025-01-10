@@ -15,3 +15,6 @@ test_*
 build
 dist
 .vscode/launch.json
+tests/TestApplications/src/*/bin
+tests/TestApplications/src/*/obj
+tests/TestApplications/.vs

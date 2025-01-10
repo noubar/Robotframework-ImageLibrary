@@ -1,0 +1,13 @@
+﻿  pch.cpp
+  ChildFrm.cpp
+  ClassView.cpp
+  FileView.cpp
+  MainFrm.cpp
+  MFCApplication.cpp
+  MFCApplicationDoc.cpp
+  MFCApplicationView.cpp
+  OutputWnd.cpp
+  PropertiesWnd.cpp
+  ViewTree.cpp
+  Generating Code...
+  MFCApplication.vcxproj -> C:\repos\Robotframework-ImageLibrary\tests\TestApplications\x64\Debug\MFCApplication.exe
