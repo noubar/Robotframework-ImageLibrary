@@ -58,6 +58,7 @@ class OrganizeKeywords:
         If no confidence was given during import, then this equals to None."""
         LOGGER.info(f'Resetting confidence level to {self.recognitions.initial_confidence}.')
         self.recognitions.confidence = self.recognitions.initial_confidence
+
     @keyword
     def set_confidence(self, new_confidence):
         """Sets the accuracy when finding images.
@@ -73,7 +74,7 @@ class OrganizeKeywords:
                 if not 1 >= new_confidence >= 0:
                     LOGGER.warn(f'Unable to set confidence to {new_confidence}. Value '
                                 'must be between 0 and 1, inclusive.')
-                    raise(InvalidConfidenceValue(new_confidence))
+                    raise InvalidConfidenceValue(new_confidence)
                 else:
                     self.recognitions.confidence = new_confidence
             except TypeError as e:

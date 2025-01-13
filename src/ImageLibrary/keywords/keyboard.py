@@ -4,7 +4,9 @@ from robot.api.deco import keyword
 
 class KeyboardKeywords:
     """
-    This keyword TODO
+    This keyword calss represents the keyboard keywords.
+    Trhrough this class you can use the keyboard interaction within your test cases.
+
     """
     def __init__(self):
         self.module = Keyboard
@@ -13,40 +15,39 @@ class KeyboardKeywords:
     def press_combination(self, *keys):
         """Press given keyboard keys.
 
-        All keyboard keys must be prefixed with ``Key.``.
-
         Keyboard keys are case-insensitive:
 
-        | Press Combination | KEY.ALT | key.f4 | 
-        | Press Combination | kEy.EnD |        |
+        | Press Combination | ALT | f4 |
+        | Press Combination | EnD |    |
 
         [https://pyautogui.readthedocs.org/en/latest/keyboard.html#keyboard-keys|
         See valid keyboard keys here].
         """
         self.module.press_combination(*keys)
 
-
     @keyword
-    def press_combination_with_pause(self, time, *keys):
+    def press_keys_and_hold(self, time, *keys):
         """Press given keyboard keys.
 
-        All keyboard keys must be prefixed with ``Key.``.
-        time: pause time in second in between each press
+        time: hold time in seconds in between each press.
+        it keeps each key down for that time, then releases it to press and hold the next key.
 
         Keyboard keys are case-insensitive:
 
-        | Press Combination | KEY.ALT | key.f4 | 
-        | Press Combination | kEy.EnD |        |
+        | Press Keys And Hold | 1 | Down | Up |
+        | Press Keys And Hold | 2 | EnD |
 
         [https://pyautogui.readthedocs.org/en/latest/keyboard.html#keyboard-keys|
         See valid keyboard keys here].
         """
-        self.module.press_combination(*keys, pause=time)
-
+        self.module.press_and_hold(time, *keys)
 
     @keyword
     def type(self, *keys_or_text):
         """Type text and keyboard keys.
+        
+        you need to defferentiate between text and keys by using Key prefix.
+        keys are case-insensitive bu text is case-sensitive.
 
         See valid keyboard keys in `Press Combination`.
 

@@ -1,5 +1,5 @@
 *** Settings ***
-Library     ${CURDIR}${/}..${/}..${/}src${/}ImageHorizonLibrary
+Library     ${CURDIR}${/}..${/}..${/}..${/}src${/}ImageLibrary
 ...             ${CURDIR}${/}reference_images${/}calculator    screenshot_folder=${OUTPUT_DIR}
 
 
@@ -20,5 +20,3 @@ Calculator
     Should be equal as integers    ${result}    1011
     Click Image    close_button
     [Teardown]    Terminate application
-
-test

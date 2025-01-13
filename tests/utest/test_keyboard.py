@@ -3,14 +3,15 @@ import sys
 import os
 from unittest import TestCase
 from unittest import mock
+from unittest.mock import patch
 import threading
 from time import time
 
 # from mock import patch, MagicMock
 srcPath = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(srcPath) 
-from src.ImageHorizonLibrary.modules.errors import KeyboardException
-from src.ImageHorizonLibrary.modules.interaction.keyboard import Keyboard
+from src.ImageLibrary.modules.errors import KeyboardException
+from src.ImageLibrary.modules.interaction.keyboard import Keyboard
 
 
 class FuncThread(threading.Thread):
@@ -67,8 +68,9 @@ class TestKeyboard(TestCase):
         """
         TODO Doc
         """
-        self.module.type('hey you fool')
-        self.mock.typewrite.assert_called_once_with('hey you fool')
+        self.module.type('I am all text')
+        self.mock.press.assert_not_called()
+        self.mock.typewrite.assert_called_once_with('I am all text')
         self.mock.reset_mock()
 
         self.module.type('.')
@@ -134,6 +136,6 @@ class TestKeyboard(TestCase):
 
 if __name__ == "__main__":
     suite = unittest.TestSuite()
-    suite.addTest(TestKeyboard("test_press_combination"))
+    suite.addTest(TestKeyboard("test_type_with_text"))
     runner = unittest.TextTestRunner()
     runner.run(suite)

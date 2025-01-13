@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import pyautogui as ag
 from ..modules.interaction.mouse import Mouse
 from robot.api.deco import keyword
 
@@ -39,6 +38,7 @@ class MouseKeywords(object):
                               button='left', interval=0.0):
         '''Clicks below of given location by given offset.
 
+        Example:
         See argument documentation in `Click To The Above Of`.
         '''
         self.module.click_to_the_direction_of('down', location, offset,
@@ -49,6 +49,7 @@ class MouseKeywords(object):
                              button='left', interval=0.0):
         '''Clicks left of given location by given offset.
 
+        Example:
         See argument documentation in `Click To The Above Of`.
         '''
         self.module.click_to_the_direction_of('left', location, offset,
@@ -59,65 +60,136 @@ class MouseKeywords(object):
                               button='left', interval=0.0):
         '''Clicks right of given location by given offset.
 
+        Example:
         See argument documentation in `Click To The Above Of`.
         '''
         self.module.click_to_the_direction_of('right', location, offset,
                                         clicks, button, interval)
 
     @keyword
-    def move_to(self, *coordinates):
+    def move_to(self, *coordinates, duration=0.0):
         '''Moves the mouse pointer to an absolute coordinates.
 
         ``coordinates`` can either be a Python sequence type with two values
         (eg. ``(x, y)``) or separate values ``x`` and ``y``:
 
+        Example:
         | Move To         | 25             | 150       |     |
         | @{coordinates}= | Create List    | 25        | 150 |
         | Move To         | ${coordinates} |           |     |
         | ${coords}=      | Evaluate       | (25, 150) |     |
         | Move To         | ${coords}      |           |     |
 
-
         X grows from left to right and Y grows from top to bottom, which means
         that top left corner of the screen is (0, 0)
+        for all valid coordinates see `Click` keyword
         '''
-        self.module.move_to(*coordinates)
+        self.module.move_to(*coordinates, duration=duration)
 
     @keyword
-    def mouse_down(self, button='left'):
-        '''Presses specidied mouse button down'''
-        ag.mouseDown(button=button)
+    def mouse_down_to(self, *coordinates, button='left'):
+        '''Presses specidied mouse button down
+        Example:
+        for all valid coordinates see `Click` keyword
+        '''
+        self.module.down(*coordinates, button=button)
 
     @keyword
-    def mouse_up(self, button='left'):
-        '''Releases specified mouse button'''
-        ag.mouseUp(button=button)
+    def mouse_up_to(self, *coordinates, button='left'):
+        '''Releases specified mouse button
+        Example:
+        for all valid coordinates see `Click` keyword
+        '''
+        self.module.up(*coordinates, button=button)
 
     @keyword
-    def click_to(self, x, y, button='left'):
+    def click_to(self, *coordinates, button='left'):
         '''Clicks with the specified mouse button.
+        Example:
+        | Click         | 25             | 150       |     |
 
         Valid buttons are ``left``, ``right`` or ``middle``.
+
+        Valid coordinates are:
+            |&{a}  |  Create Dictionary    x=100    y=200
+            | Click | ${a}  |
+
+            |@{a} | Create List | 100 | 200 |
+            | Click | ${a} |
+
+            |${a} | Evaluate | (100,200) |
+            | Click | ${a}  |
+
+            | Click | 100 | 200 |
+
+            | Click | x=100 | y=200 |
+
+            | Click | 100,200 |
         '''
-        ag.click(x, y, button=button)
+        self.module.click(*coordinates, button=button)
 
     @keyword
-    def double_click_to(self, x, y, button='left', interval=0.0):
+    def click_hold_to(self, *coordinates, time, button='left'):
+        '''Clicks with the specified mouse button.
+        time is the time in seconds to hold the button down.
+        Valid buttons are ``left``, ``right`` or ``middle``.
+        Example:
+            | Click Hold To   | 25 | 150 | 2 |
+        for all valid coordinates see `Click` keyword
+        '''
+        self.module.click_hold(*coordinates, time=time, button=button)
+
+    @keyword
+    def drag_and_drop_to(self,*doublecoordinates, button='left', duration=0.0):
+        '''Clicks with the specified mouse button.
+        time is the time in seconds to hold the button down.
+        Valid buttons are ``left``, ``right`` or ``middle``.
+        Example:
+            | Drag And Drop To | 25 | 150 | 29 | 28 |
+            | ${coordsFrom}=   | Evaluate | (25, 150) |
+            | ${coordsTo}=     | Evaluate | (25, 150) |
+            | Drag And Drop To | ${coordsFrom} | ${coordsTo} | button=right | duration=2 |
+
+        Valid coordinates are:
+            | &{a} | Create Dictionary | x=100 | y=200 |
+            | &{b} | Create Dictionary | x=300 | y=400 |
+            | Drag And Drop To | ${a} | ${b} |
+
+            | @{a} | Create List | 100 | 20 |
+            | @{b} | Create List | 300 | 40 |
+            | Drag And Drop To | ${a} | ${b} |
+
+            | ${a} | Evaluate | (100,200) |
+            | ${b} | Evaluate | (300,400) |
+            | Drag And Drop To | ${a} | ${b} |
+
+            | Drag And Drop To | 100 | 200 | 300 | 400 |
+
+            | Drag And Drop To | 100,200 | 100,200 |
+
+            | Drag And Drop To | x=100 | y=200 | x=300 | y=400 |
+        '''
+        self.module.drag_and_drop(*doublecoordinates, button=button, duration=duration)
+
+    @keyword
+    def double_click_to(self, *coordinates, button='left', interval=0.0):
         '''Double clicks with the specified mouse button.
 
         See documentation of ``button`` in `Click`.
 
         ``interval`` specifies the time between clicks and should be
         floating point number.
+        for all valid coordinates see `Click` keyword
         '''
-        ag.doubleClick(x, y, button=button, interval=float(interval))
+        self.module.double_click(*coordinates, interval=float(interval), button=button)
 
     @keyword
-    def triple_click_to(self, x, y, button='left', interval=0.0):
+    def triple_click_to(self, *coordinates, button='left', interval=0.0):
         '''Triple clicks with the specified mouse button.
 
         See documentation of ``button`` in `Click`.
 
         See documentation of ``interval`` in `Double Click`.
+        for all valid coordinates see `Click` keyword
         '''
-        ag.tripleClick(x, y, button=button, interval=float(interval))
+        self.module.triple_click(*coordinates, interval=float(interval), button=button)

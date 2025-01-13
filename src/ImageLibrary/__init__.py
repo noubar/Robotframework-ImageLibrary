@@ -7,30 +7,30 @@ from .modules.errors import *    # import errors before checking dependencies!
 try:
     import pyautogui as ag
 except ImportError as e:
-    raise ImageHorizonLibraryError('There is something wrong with pyautogui or '
+    raise ImageLibraryError('There is something wrong with pyautogui or '
                                    'it is not installed.') from e
 try:
     from robot.api import logger as LOGGER
     from robot.libraries.BuiltIn import BuiltIn
 except ImportError as e:
-    raise ImageHorizonLibraryError('There is something wrong with '
+    raise ImageLibraryError('There is something wrong with '
                                    'Robot Framework or it is not installed.') from e
 try:
     from tkinter import Tk as TK
 except ImportError as e:
-    raise ImageHorizonLibraryError('There is either something wrong with '
+    raise ImageLibraryError('There is either something wrong with '
                                    'Tkinter or you are running this on Java, '
                                    'which is not a supported platform. Please '
                                    'use Python and verify that Tkinter works.') from e
 try:
     import skimage
 except ImportError as e:
-    raise ImageHorizonLibraryError('There is either something wrong with skimage '
+    raise ImageLibraryError('There is either something wrong with skimage '
                                     '(scikit-image) or it is not installed.') from e
 try:
     import cv2
 except ImportError as e:
-    raise ImageHorizonLibraryError('There is either something wrong with cv2 '
+    raise ImageLibraryError('There is either something wrong with cv2 '
                                     '(opencv-python) or it is not installed.') from e
 
 from .keywords import(KeyboardKeywords,
@@ -46,7 +46,7 @@ from .modules.orchestrer import Orchesterer
 
 __version__ = VERSION
 
-class ImageHorizonLibrary(DynamicCore):
+class ImageLibrary(DynamicCore):
     """A cross-platform Robot Framework library for GUI automation.
 
     *Key features*: 
@@ -85,7 +85,7 @@ class ImageHorizonLibrary(DynamicCore):
     Using good names for reference images is evident from easy-to-read test
     data:
 
-    | `Import Library` | ImageHorizonLibrary                   | reference_folder=images |                                                            |
+    | `Import Library` | ImageLibrary                   | reference_folder=images |                                                            |
     | `Click Image`    | popup Window title                    |                         | # Path is images/popup_window_title.png                    |
     | `Click Image`    | button Login Without User Credentials |                         | # Path is images/button_login_without_user_credentials.png |
 
@@ -212,11 +212,11 @@ class ImageHorizonLibrary(DynamicCore):
     ROBOT_LISTENER_API_VERSION = 2
 
     def __init__(self, reference_folder=None, screenshot_folder=None,
-                 keyword_on_failure='ImageHorizonLibrary.Take A Screenshot',
+                 keyword_on_failure='ImageLibrary.Take A Screenshot',
                  confidence=0.99, strategy='default',
                  edge_sigma=2.0, edge_low_threshold=0.1, edge_high_threshold=0.3,
                  recognition_timeout=0):
-        """ImageHorizonLibrary can be imported with several options.
+        """ImageLibrary can be imported with several options.
         
         ``reference_folder`` is path to the folder where all reference images
         are stored. It must be a _valid absolute path_. As the library

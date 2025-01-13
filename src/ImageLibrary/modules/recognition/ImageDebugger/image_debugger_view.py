@@ -7,7 +7,7 @@ from .image_manipulation import ImageFormat
 class UILocatorView(Tk):
     def __init__(self, controller, image_container, image_horizon_instance):
         super().__init__()
-        self.title("ImageHorizonLibrary - Debugger")
+        self.title("ImageLibrary - Debugger")
         self.resizable(False, False)
         self.controller = controller
         self.image_container = image_container

@@ -1,10 +1,12 @@
 import subprocess
+import psutil
+import pyautogui as ag
 import shlex
 from tkinter import Tk as TK
-import pyautogui as ag
 from .keyboard import Keyboard
 from ..errors import OSException,InvalidAlias
 from robot.api import logger
+from time import time, sleep
 
 class OperatingSystem:
     """
@@ -27,9 +29,16 @@ class OperatingSystem:
     def copy(self):
         """Executes ``Ctrl+C`` on Windows and Linux, ``⌘+C`` on OS X and
         returns the content of the clipboard."""
-        key = 'Key.command' if self.platform.is_mac else 'Key.ctrl'
-        Keyboard.press(key, 'c')
+        key = 'command' if self.platform.is_mac else 'ctrl'
+        Keyboard.press_combination(key, 'c')
         return self.get_clipboard_content()
+
+    def paste(self):
+        """Executes ``Ctrl+C`` on Windows and Linux, ``⌘+C`` on OS X and
+        returns the content of the clipboard."""
+        key = 'command' if self.platform.is_mac else 'ctrl'
+        Keyboard.press_combination(key, 'v')
+        return True
 
     def get_clipboard_content(self):
         """Returns what is currently copied in the system clipboard."""
@@ -65,7 +74,43 @@ class OperatingSystem:
                                   '`Launch Application` called first.') from e
         process.terminate()
 
-    def launch_application(self, appandargs:list, alias=None):
+    def launch_app(self, appandargs:list, process_name, timeout=60, alias=None):
+        """Launches an application.
+
+        Executes the string argument ``app`` as a separate process with
+        Python's
+        ``[https://docs.python.org/2/library/subprocess.html|subprocess]``
+        module. It should therefore be the exact command you would use to
+        launch the application from command line.
+
+        On Windows, if you are using relative or absolute paths in ``app``,
+        enclose the command with double quotes:
+
+        | Launch Application | "C:\\my folder\\myprogram.exe" | # Needs quotes       ||||
+        | Launch Application | myprogram.exe | # No need for quotes ||||
+        | Launch Application | myprogram.exe | arg1 | arg2 | # Program with arguments ||
+        | Launch Application | myprogram.exe | alias=myprog | # Program with alias |||
+        | Launch Application | myprogram.exe | arg1 | arg2 | alias=myprog | # Program with arguments and alias |
+
+        Returns automatically generated alias which can be used with `Terminate
+        Application`.
+
+        Automatically generated alias can be overridden by providing ``alias``
+        yourself.
+        """
+        alias = self.subprocess(appandargs, alias)
+        start_time = time()
+        while time() - start_time < timeout:
+            # Check all running processes
+            for proc in psutil.process_iter(attrs=['name']):
+                if proc.info['name'] == process_name:
+                    return alias
+            sleep(1)  # Wait before checking again
+        self.defaults.open_applications.pop(alias, None)
+        # If the process is not found, raise an exception
+        raise OSException(f'Process "{process_name}" not found after {timeout} seconds.')
+
+    def subprocess(self, appandargs:list, alias=None):
         """Launches an application.
 
         Executes the string argument ``app`` as a separate process with

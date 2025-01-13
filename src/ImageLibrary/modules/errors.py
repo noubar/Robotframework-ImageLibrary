@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-class ImageHorizonLibraryError(ImportError):
+class ImageLibraryError(ImportError):
     pass
 
 
