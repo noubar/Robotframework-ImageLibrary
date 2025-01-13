@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from os.path import abspath, dirname, join as path_join
 from setuptools import setup, find_packages
-from src.ImageHorizonLibrary.version import VERSION
+from src.ImageLibrary.version import VERSION
 
 SETUPDIR = abspath(dirname(__file__))
 
@@ -27,14 +27,14 @@ Topic :: Software Development :: Testing
 License :: OSI Approved :: MIT License
 '''.strip().splitlines()
 
-setup(name='robotframework-imagehorizonlibrary',
+setup(name='robotframework-ImageLibrary',
       author='Eficode Oy',
       author_email='info@eficode.com',
-      url='https://github.com/Eficode/robotframework-imagehorizonlibrary',
+      url='https://github.com/Eficode/robotframework-ImageLibrary',
       license='MIT',
       platforms='any',
       packages=find_packages('src'),
-      package_dir={'ImageHorizonLibrary': 'src/ImageHorizonLibrary'},
+      package_dir={'ImageLibrary': 'src/ImageLibrary'},
       install_requires = REQUIREMENTS,
       keywords=KEYWORDS,
       classifiers=CLASSIFIERS,

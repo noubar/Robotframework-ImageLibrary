@@ -1,0 +1,4 @@
+eel
+mock
+pyqt5 # to use skimage.viewer.ImageViewer(refImage) while debugging
+matplotlib
