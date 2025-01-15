@@ -8,11 +8,11 @@ class MouseKeywords(object):
         self.module = Mouse
 
     @keyword
-    def click_to_the_above_of(self, location, offset, clicks=1,
+    def click_above_of(self, offset, *coordinates, clicks=1,
                               button='left', interval=0.0):
         '''Clicks above of given location by given offset.
 
-        ``location`` can be any Python sequence type (tuple, list, etc.) that
+        ``coordinates`` can be any Python sequence type (tuple, list, etc.) that
         represents coordinates on the screen ie. have an x-value and y-value.
         Locating-related keywords return location you can use with this
         keyword.
@@ -21,50 +21,50 @@ class MouseKeywords(object):
 
         ``clicks`` is how many times the mouse button is clicked.
 
-        See `Click` for documentation for valid buttons.
+        See `Click` for documentation for valid coordinates or buttons.
 
         Example:
 
-        | ${image location}=    | Locate             | my image |        |
-        | Click To The Above Of | ${image location}  | 50       |        |
-        | @{coordinates}=       | Create List        | ${600}   | ${500} |
-        | Click To The Above Of | ${coordinates}     | 100      |        |
+        | ${image location}= | Locate | my image | |
+        | Click Above Of | 50 | ${image location} |
+        | @{coordinates}= | Create List | ${600} | ${500} |
+        | Click Above Of | 100 | ${coordinates} | |
         '''
-        self.module.click_to_the_direction_of('up', location, offset,
-                                        clicks, button, interval)
+        self.module.click_to_direction_of('up', offset,
+                                        clicks, button, interval, *coordinates)
 
     @keyword
-    def click_to_the_below_of(self, location, offset, clicks=1,
+    def click_below_of(self, offset, *coordinates, clicks=1,
                               button='left', interval=0.0):
         '''Clicks below of given location by given offset.
 
         Example:
-        See argument documentation in `Click To The Above Of`.
+        See argument documentation in `Click Above Of`.
         '''
-        self.module.click_to_the_direction_of('down', location, offset,
-                                        clicks, button, interval)
+        self.module.click_to_direction_of('down', offset,
+                                        clicks, button, interval, *coordinates)
 
     @keyword
-    def click_to_the_left_of(self, location, offset, clicks=1,
+    def click_left_of(self, offset, *coordinates, clicks=1,
                              button='left', interval=0.0):
         '''Clicks left of given location by given offset.
 
         Example:
-        See argument documentation in `Click To The Above Of`.
+        See argument documentation in `Click Above Of`.
         '''
-        self.module.click_to_the_direction_of('left', location, offset,
-                                        clicks, button, interval)
+        self.module.click_to_direction_of('left', offset,
+                                        clicks, button, interval, *coordinates)
 
     @keyword
-    def click_to_the_right_of(self, location, offset, clicks=1,
+    def click_right_of(self, offset, *coordinates, clicks=1,
                               button='left', interval=0.0):
         '''Clicks right of given location by given offset.
 
         Example:
-        See argument documentation in `Click To The Above Of`.
+        See argument documentation in `Click Above Of`.
         '''
-        self.module.click_to_the_direction_of('right', location, offset,
-                                        clicks, button, interval)
+        self.module.click_to_direction_of('right', offset,
+                                        clicks, button, interval, *coordinates)
 
     @keyword
     def move_to(self, *coordinates, duration=0.0):
@@ -129,7 +129,7 @@ class MouseKeywords(object):
         self.module.click(*coordinates, button=button)
 
     @keyword
-    def click_hold_to(self, *coordinates, time, button='left'):
+    def click_hold_to(self, time, *coordinates, button='left'):
         '''Clicks with the specified mouse button.
         time is the time in seconds to hold the button down.
         Valid buttons are ``left``, ``right`` or ``middle``.
@@ -140,7 +140,7 @@ class MouseKeywords(object):
         self.module.click_hold(*coordinates, time=time, button=button)
 
     @keyword
-    def drag_and_drop_to(self,*doublecoordinates, button='left', duration=0.0):
+    def drag_and_drop_to(self, *doublecoordinates, button='left', duration=0.0):
         '''Clicks with the specified mouse button.
         time is the time in seconds to hold the button down.
         Valid buttons are ``left``, ``right`` or ``middle``.
@@ -193,3 +193,12 @@ class MouseKeywords(object):
         for all valid coordinates see `Click` keyword
         '''
         self.module.triple_click(*coordinates, interval=float(interval), button=button)
+
+    @keyword
+    def scroll_to(self, amount, *coordinates):
+        '''sends mouse scroll to the given location either up if amount is positive
+        or down if the amount is negative.
+
+        for all valid coordinates see `Click` keyword
+        '''
+        self.module.scroll_to(*coordinates, amount=amount)

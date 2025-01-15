@@ -1,19 +1,20 @@
 import pyautogui as ag
+ag.FAILSAFE = False
 from ..errors import MouseException
 from robot.api import logger as LOGGER
-
 
 class Mouse:
     """
     This class contains keywords for mouse interactions such as clicking, moving, and dragging.
     """
+
     @staticmethod
-    def click_to_the_direction_of(direction, location, offset, clicks, button, interval):
+    def click_to_direction_of(direction, offset, clicks, button, interval, *coordinates):
         """
         Clicks at a specified location in a given direction with a specified mouse button.
         Args:
             direction (str): The direction to click towards (e.g., 'up', 'down', 'left', 'right').
-            location (tuple): The base location (x, y) from which the direction is calculated.
+            coordinates (tuple): The base location (x, y) from which the direction is calculated.
             offset (int): The offset distance from the base location in the specified direction.
             clicks (int): The number of times to click.
             button (str): The mouse button to use for clicking ('left', 'middle', 'right').
@@ -27,6 +28,7 @@ class Mouse:
             # at an interval of 0.5 seconds.
                                    clicks, button, interval):
         """
+        location = Extras.validate_coordinates(coordinates)
         x, y = Extras.get_location_according_direction(direction, location, offset)
         try:
             clicks = int(clicks)
@@ -38,7 +40,6 @@ class Mouse:
             interval = float(interval)
         except ValueError as e:
             raise MouseException('Invalid argument "%s" for `interval`') from e
-
         LOGGER.info(f'Clicking {clicks} time(s) at ({x}, {y}) with '
                     f'{button} mouse button at interval {interval}')
         ag.click(x, y, clicks=clicks, button=button, interval=interval)
@@ -48,7 +49,7 @@ class Mouse:
         """
         TODO Doc
         """
-        coordinates = Extras.validate_cordinates(coordinates)
+        coordinates = Extras.validate_coordinates(coordinates)
         ag.moveTo(coordinates, duration=duration)
 
     @staticmethod
@@ -56,7 +57,7 @@ class Mouse:
         """
         TODO Doc
         """
-        coordinates = Extras.validate_cordinates(coordinates)
+        coordinates = Extras.validate_coordinates(coordinates)
         ag.mouseUp(coordinates, button=button)
 
     @staticmethod
@@ -64,7 +65,7 @@ class Mouse:
         """
         TODO Doc
         """
-        coordinates = Extras.validate_cordinates(coordinates)
+        coordinates = Extras.validate_coordinates(coordinates)
         ag.mouseDown(coordinates, button=button)
 
     @staticmethod
@@ -72,7 +73,7 @@ class Mouse:
         """
         TODO Doc
         """
-        coordinates = Extras.validate_cordinates(coordinates)
+        coordinates = Extras.validate_coordinates(coordinates)
         ag.click(*coordinates, button=button)
 
     @staticmethod
@@ -80,7 +81,7 @@ class Mouse:
         """
         TODO Doc
         """
-        coordinates = Extras.validate_cordinates(coordinates)
+        coordinates = Extras.validate_coordinates(coordinates)
         ag.doubleClick(coordinates, interval=interval, button=button)
 
     @staticmethod
@@ -88,7 +89,7 @@ class Mouse:
         """
         TODO Doc
         """
-        coordinates = Extras.validate_cordinates(coordinates)
+        coordinates = Extras.validate_coordinates(coordinates)
         ag.tripleClick(coordinates, interval=interval, button=button)
 
     @staticmethod
@@ -96,7 +97,7 @@ class Mouse:
         """
         TODO Doc
         """
-        coordinates = Extras.validate_cordinates(coordinates)
+        coordinates = Extras.validate_coordinates(coordinates)
         ag.mouseDown(coordinates, button=button)
         ag.sleep(time)
         ag.mouseUp(button=button)
@@ -111,8 +112,15 @@ class Mouse:
         ag.moveTo(coordinates[1], duration=duration)
         ag.mouseUp(coordinates[1], button=button)
 
-class Extras:
+    @staticmethod
+    def scroll_to(*coordinates, amount):
+        """
+        TODO Doc
+        """
+        coordinates = Extras.validate_coordinates(coordinates)
+        ag.scroll(amount, coordinates[0], coordinates[1])
 
+class Extras:
     @staticmethod
     def validate_double_coordinates(coordinates):
         """
@@ -124,21 +132,21 @@ class Extras:
             ('100', '200', '300', '400') to ((100,200), (300,400))
             ('100,200', '100,200') to ((100,200), (100,200))
             ('x=100', 'y=200', 'x=300', 'y=400') to ((100,200), (300,400))
-        examples are fed to validate_cordinates"""
+        examples are fed to validate_coordinates"""
         if isinstance(coordinates, (list, tuple)):
             coords = ()
             if len(coordinates) == 2:
-                coords = (Extras.validate_cordinates((coordinates[0],)), Extras.validate_cordinates((coordinates[0],)))
+                coords = (Extras.validate_coordinates((coordinates[0],)), Extras.validate_coordinates((coordinates[0],)))
             elif len(coordinates) == 4:
-                coords = (Extras.validate_cordinates(coordinates[:2]), Extras.validate_cordinates(coordinates[2:]))
+                coords = (Extras.validate_coordinates(coordinates[:2]), Extras.validate_coordinates(coordinates[2:]))
             else:
                 raise MouseException('Invalid number of coordinates. Please give either pair of (x, y) or pair x, y.')
             return coords
         else:
             raise MouseException('Invalid type of coordinates. Please give either pair of (x, y), [x, y], {"x": x, "y": y}, or "x=value, y=value".')
-    
+
     @staticmethod
-    def validate_cordinates(coordinates):
+    def validate_coordinates(coordinates):
         """
         Takes either tuple of tuple, list, str, or dictionary and returns a tuple of integers.
         all valid input output examples:

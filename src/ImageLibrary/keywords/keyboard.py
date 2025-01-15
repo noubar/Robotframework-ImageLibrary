@@ -7,40 +7,74 @@ class KeyboardKeywords:
     This keyword calss represents the keyboard keywords.
     Trhrough this class you can use the keyboard interaction within your test cases.
 
+    press keywords are used to press a single key or a combination of keys or chars.
+    type keyword is used to type a string or a combination of keys and strings.
+
     """
     def __init__(self):
         self.module = Keyboard
 
     @keyword
-    def press_combination(self, *keys):
+    def press_keys(self, *keys, pause=0.0):
         """Press given keyboard keys.
-
+        Keys and chars are only available, you can use `type` keyword for strings.
         Keyboard keys are case-insensitive:
 
-        | Press Combination | ALT | f4 |
-        | Press Combination | EnD |    |
+        pause: time in seconds to wait between each key press.
+
+        Examples:
+        | Press Keys | EnD |    |
+        | Press Keys | ALT | f4 |
+        | Press Keys | ctrl | Shift | c | pause=2 |
 
         [https://pyautogui.readthedocs.org/en/latest/keyboard.html#keyboard-keys|
         See valid keyboard keys here].
         """
-        self.module.press_combination(*keys)
+        self.module.press_keys(*keys, pause=pause)
 
     @keyword
-    def press_keys_and_hold(self, time, *keys):
-        """Press given keyboard keys.
+    def press_and_hold(self, time, *keys, repeated=True):
+        """Presses and holds each given keyboard chars or keys after each other for a given time.
+
+        time: hold time in seconds of each press.
+        it keeps each key down for that time, then releases it to press and hold the next key.
+        repeated: if True, the key will be repeatedly down until it is released,
+        to overcome the following problem of pyautogui:
+
+        NOTE: For some reason, this does not seem to cause key repeats like would
+        happen if a keyboard key was held down on a text field.
+
+        Keyboard keys are case-insensitive:
+
+        | Press And Hold | 1 | Down | Up |
+        | Press And Hold | 1 | S | W |
+        | Press And Hold | 2 | EnD |
+
+        [https://pyautogui.readthedocs.org/en/latest/keyboard.html#keyboard-keys|
+        See valid keyboard keys here].
+        """
+        self.module.press_and_hold(time, *keys, repeated=repeated)
+
+    @keyword
+    def press_and_hold_together(self, time, *keys, repeated=True):
+        """Presses given all given keyboard chars or keys together for a given time.
 
         time: hold time in seconds in between each press.
         it keeps each key down for that time, then releases it to press and hold the next key.
+        repeated: if True, the key will be repeatedly down until it is released,
+        to overcome the following problem of pyautogui:
 
+        NOTE: For some reason, this does not seem to cause key repeats like would
+        happen if a keyboard key was held down on a text field.
         Keyboard keys are case-insensitive:
 
-        | Press Keys And Hold | 1 | Down | Up |
-        | Press Keys And Hold | 2 | EnD |
+        | Press And Hold | 1 | Down | Up |
+        | Press And Hold | 2 | EnD |
 
         [https://pyautogui.readthedocs.org/en/latest/keyboard.html#keyboard-keys|
         See valid keyboard keys here].
         """
-        self.module.press_and_hold(time, *keys)
+        self.module.press_and_hold_all(time, *keys, repeated=repeated)
 
     @keyword
     def type(self, *keys_or_text):
@@ -62,12 +96,14 @@ class KeyboardKeywords:
     @keyword
     def type_with_keys_down(self, text, *keys):
         """Press keyboard keys down, then write given text, then release the
-        keyboard keys. Which means Press and Hold all given keys and then release them all.
+        keyboard keys. 
 
         See valid keyboard keys in `Press Combination`.
 
         Examples:
 
         | Type with keys down | write this in caps  | Key.Shift |
+        | Type with keys down | l | key.ctrl | Key.Shift | 
+
         """
-        self.module.type_with_keys_down( text, *keys)
+        self.module.type_with_keys_down(text, *keys)

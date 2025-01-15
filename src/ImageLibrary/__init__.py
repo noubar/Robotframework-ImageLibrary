@@ -49,6 +49,8 @@ __version__ = VERSION
 class ImageLibrary(DynamicCore):
     """A cross-platform Robot Framework library for GUI automation.
 
+    NOTE: To ensure x y coordinates are correct, the screen resolution scaling must be set to 100%.
+
     *Key features*: 
     - Automates *keyboard and mouse actions* on the screen 
     (based on [https://pyautogui.readthedocs.org|pyautogui]).

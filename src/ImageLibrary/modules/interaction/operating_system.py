@@ -1,7 +1,7 @@
+
 import subprocess
 import psutil
 import pyautogui as ag
-import shlex
 from tkinter import Tk as TK
 from .keyboard import Keyboard
 from ..errors import OSException,InvalidAlias
@@ -12,7 +12,7 @@ class OperatingSystem:
     """
     TODO Doc
     """
-    class _tk:
+    class _Clipboard:
         def __init__(self):
             self.tk = TK()
 
@@ -30,19 +30,19 @@ class OperatingSystem:
         """Executes ``Ctrl+C`` on Windows and Linux, ``⌘+C`` on OS X and
         returns the content of the clipboard."""
         key = 'command' if self.platform.is_mac else 'ctrl'
-        Keyboard.press_combination(key, 'c')
+        Keyboard.press_keys(key, 'c')
         return self.get_clipboard_content()
 
     def paste(self):
         """Executes ``Ctrl+C`` on Windows and Linux, ``⌘+C`` on OS X and
         returns the content of the clipboard."""
         key = 'command' if self.platform.is_mac else 'ctrl'
-        Keyboard.press_combination(key, 'v')
+        Keyboard.press_keys(key, 'v')
         return True
 
     def get_clipboard_content(self):
         """Returns what is currently copied in the system clipboard."""
-        with OperatingSystem._tk() as clipboard_content:
+        with OperatingSystem._Clipboard() as clipboard_content:
             return clipboard_content
 
     def pause(self):
