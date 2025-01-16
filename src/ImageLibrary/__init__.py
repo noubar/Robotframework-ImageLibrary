@@ -214,7 +214,7 @@ class ImageLibrary(DynamicCore):
     ROBOT_LISTENER_API_VERSION = 2
 
     def __init__(self, reference_folder=None, screenshot_folder=None,
-                 keyword_on_failure='ImageLibrary.Take A Screenshot',
+                 keyword_on_failure='Take Screenshot',
                  confidence=0.99, strategy='default',
                  edge_sigma=2.0, edge_low_threshold=0.1, edge_high_threshold=0.3,
                  recognition_timeout=0):
@@ -266,20 +266,20 @@ class ImageLibrary(DynamicCore):
         try:
             return DynamicCore.run_keyword(self, name, args, kwargs)
         except Exception:
-            # if self.defaults.keyword_on_failure:
-            #     self._run_on_failure()
+            if self.defaults.keyword_on_failure:
+                self._run_on_failure()
             raise
 
-    # def _run_on_failure(self):
-    #     if not self.defaults.keyword_on_failure:
-    #         return
-    #     try:
-    #         BuiltIn().run_keyword(self.defaults.keyword_on_failure)
-    #     except Exception as e:
-    #         LOGGER.debug(e)
-    #         LOGGER.warn('Failed to run keyword_on_failure in imagelibrary.'
-    #                     'Is Robot Framework running')
+    def _run_on_failure(self):
+        if not self.defaults.keyword_on_failure:
+            return
+        try:
+            BuiltIn().run_keyword(self.defaults.keyword_on_failure)
+        except Exception as e:
+            LOGGER.debug(e)
+            LOGGER.warn('Failed to run keyword_on_failure in imagelibrary.'
+                        'Is Robot Framework running')
 
-    # def _start_test(self, name, attrs):  # pylint: disable=unused-argument
-    #       self.screenshots.set_name(name)
-    #       self.screenshots.counter = 1
+    def _start_test(self, name, attrs):  # pylint: disable=unused-argument
+        self.screenshots.set_name(name)
+        self.screenshots.counter = 1

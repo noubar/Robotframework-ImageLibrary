@@ -21,7 +21,7 @@ class Screenshot:
         self.screenshots.counter += 1
         return path
 
-    def take_a_screenshot(self, allscreens: bool):
+    def take_screenshot(self, allscreens: bool):
         '''Takes a screenshot of the screen.
 
         This keyword is run on failure if it is not overwritten when
@@ -41,8 +41,8 @@ class Screenshot:
                                             f'"{target_dir}"' )
         path = self._make_up_filename()
         path = abspath(path_join(target_dir, path))
-        logpath = BuiltIn().get_variable_value('${OUTPUT DIR}')
-        relativepath = relpath(path, start=logpath).replace('\\', '\/')
+        # logpath = BuiltIn().get_variable_value('${OUTPUT DIR}')
+        # relativepath = relpath(path, start=logpath).replace('\\', '\/')
+        ag.screenshot(path, allScreens=allscreens)
         LOGGER.info('Screenshot taken: '
-                    '{0}<br/><img src="{0}" width="100%" />'.format(relativepath), html=True)
-        ag.screenshot(path, allscreens)
+                    '{0}<br/><img src="{0}" width="100%" />'.format(path), html=True)

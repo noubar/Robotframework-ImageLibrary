@@ -56,7 +56,7 @@ class OperatingSystem:
         ag.alert(text='Test execution paused.', title='Pause',
                  button='Continue')
 
-    def terminate_application(self, alias=None):
+    def terminate_process(self, alias=None):
         """Terminates the process launched with `Launch Application` with
         given ``alias``.
 
@@ -75,7 +75,10 @@ class OperatingSystem:
         process.terminate()
 
     def launch_app(self, appandargs:list, process_name, timeout=60, alias=None):
-        """Launches an application.
+        """Launches an application. and awaits the process to start.
+            It will not check if the process is already running.
+
+        Process: The process name to be checked in the running processes.
 
         Executes the string argument ``app`` as a separate process with
         Python's
@@ -86,11 +89,6 @@ class OperatingSystem:
         On Windows, if you are using relative or absolute paths in ``app``,
         enclose the command with double quotes:
 
-        | Launch Application | "C:\\my folder\\myprogram.exe" | # Needs quotes       ||||
-        | Launch Application | myprogram.exe | # No need for quotes ||||
-        | Launch Application | myprogram.exe | arg1 | arg2 | # Program with arguments ||
-        | Launch Application | myprogram.exe | alias=myprog | # Program with alias |||
-        | Launch Application | myprogram.exe | arg1 | arg2 | alias=myprog | # Program with arguments and alias |
 
         Returns automatically generated alias which can be used with `Terminate
         Application`.
@@ -102,8 +100,9 @@ class OperatingSystem:
         start_time = time()
         while time() - start_time < timeout:
             # Check all running processes
-            for proc in psutil.process_iter(attrs=['name']):
-                if proc.info['name'] == process_name:
+            for proc in psutil.process_iter(attrs=['name','status']):
+                print(proc, ": ",proc.info['name'])
+                if proc.info['name'] == process_name and proc.info['status'] == 'running':
                     return alias
             sleep(1)  # Wait before checking again
         self.defaults.open_applications.pop(alias, None)
@@ -122,11 +121,6 @@ class OperatingSystem:
         On Windows, if you are using relative or absolute paths in ``app``,
         enclose the command with double quotes:
 
-        | Launch Application | "C:\\my folder\\myprogram.exe" | # Needs quotes       ||||
-        | Launch Application | myprogram.exe | # No need for quotes ||||
-        | Launch Application | myprogram.exe | arg1 | arg2 | # Program with arguments ||
-        | Launch Application | myprogram.exe | alias=myprog | # Program with alias |||
-        | Launch Application | myprogram.exe | arg1 | arg2 | alias=myprog | # Program with arguments and alias |
 
         Returns automatically generated alias which can be used with `Terminate
         Application`.

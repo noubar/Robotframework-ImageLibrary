@@ -98,8 +98,8 @@ class _StrategySkimage():
             )
 
 class _StrategyPyautogui():
-    def __init__(self, confidence):
-        self.confidence = confidence
+    def __init__(self, recognitions):
+        self.confidence = float(recognitions.confidence)
 
     def try_locate(self, ref_image, haystack_image=None, locate_all=False):
         """Tries to locate the reference image on the screen or the haystack_image. 

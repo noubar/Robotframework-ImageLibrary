@@ -38,7 +38,7 @@ class OperatingSystemKeywords(object):
         self.module.subprocess(list(appandargs), alias=alias)
 
     @keyword
-    def launch_app(self, *appandargs, name, alias=None):
+    def launch_app(self, *appandargs, name=None, alias=None, timeout=10):
         """starts a process. 
 
         Executes the string argument ``app`` as a separate process with
@@ -50,11 +50,11 @@ class OperatingSystemKeywords(object):
         On Windows, if you are using relative or absolute paths in ``app``,
         enclose the command with double quotes:
 
-        | Launch App | "C:\\my folder\\myprogram.exe" | # Needs quotes |
-        | Launch App | myprogram.exe | # No need for quotes |
-        | Launch App | myprogram.exe | arg1 | arg2 | # Program with arguments |
-        | Launch App | myprogram.exe | alias=myprog | # Program with alias |
-        | Launch App | myprogram.exe | arg1 | arg2 | alias=myprog | # Program with arguments and alias |
+        | Launch App | "C:\\my folder\\myprogram.exe" | # Needs quotes       |
+        | Launch App | myprogram.exe | name=myprogram.exe | # No need for quotes |
+        | Launch App | myprogram.exe | arg1 | arg2 | name=myprogram.exe | # Program with arguments |
+        | Launch App | myprogram.exe | alias=myprog | name=myprogram.exe | # Program with alias |
+        | Launch App | myprogram.exe | arg1 | arg2 | name=myprogram.exe | alias=myprog | # Program with arguments and alias |
 
         Automatic generated alias is an index number.
         it can be overridden by providing ``alias`` yourself.
@@ -63,7 +63,8 @@ class OperatingSystemKeywords(object):
         Application` keyword.
 
         """
-        self.module.launch_app(list(appandargs), name, alias=alias)
+        name = name if name else appandargs[0]
+        self.module.launch_app(list(appandargs), name, alias=alias, timeout=timeout)
 
     @keyword
     def terminate_subprocess(self, alias=None):
@@ -73,7 +74,7 @@ class OperatingSystemKeywords(object):
         If no ``alias`` is given, terminates the last process that was
         launched.
         """
-        self.module.terminate_application(alias)
+        self.module.terminate_process(alias)
 
     @keyword
     def get_pid_of_launched_app(self, alias):

@@ -10,7 +10,7 @@ class ScreenshotKeywords():
         self.module = Screenshot(screenshots)
 
     @keyword
-    def take_a_screenshot(self, allscreens=False):
+    def take_screenshot(self, allscreens=False):
         '''Takes a screenshot of the screen.
 
         This keyword is run on failure if it is not overwritten when
@@ -24,4 +24,4 @@ class ScreenshotKeywords():
         Framework execution, file name is this library's name with running
         integer appended.
         '''
-        self.module.take_a_screenshot(allscreens)
+        self.module.take_screenshot(allscreens)

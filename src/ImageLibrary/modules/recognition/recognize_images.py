@@ -12,10 +12,9 @@ class RecognizeImage():
     dflt_timeout = 0
     pixel_ratio = 0.0
 
-    def __init__(self,defualts, recognitions):
-        self.defualts = defualts
+    def __init__(self,defaults, recognitions):
+        self.defaults = defaults
         self.recognitions = recognitions
-
 
     def _get_pixel_ratio(self):
         self.pixel_ratio = ag.screenshot().size[0]/ag.size().width
@@ -24,46 +23,36 @@ class RecognizeImage():
         if (not path or not isinstance(path, str)):
             raise InvalidImageException(f'"{path}" is invalid image name.' )
         path = str(path.lower().replace(' ', '_'))
-        path = abspath(path_join(self.defualts.reference_folder, path))
+        path = abspath(path_join(self.defaults.reference_folder, path))
         if not path.endswith('.png') and not isdir(path):
             path += '.png'
         if not isfile(path) and not isdir(path):
             raise InvalidImageException(f'Image path not found: "{path}".' )
         return path
 
-    # @contextmanager
-    # def _suppress_keyword_on_failure(self):
-    #     keyword = self.defaults.keyword_on_failure
-    #     self.defaults.keyword_on_failure = None
-    #     yield None
-    #     self.defaults.keyword_on_failure = keyword
-
-    def _get_reference_images(self, reference_image):
+    def _get_reference_images(self, reference_image_folder):
         """Return an absolute path for the given reference imge. 
         Return as a list of those if reference_image is a folder.
         """
         is_dir = False
-        try:
-            if isdir(self._normalize(reference_image)):
-                is_dir = True
-        except InvalidImageException:
-            pass
-        is_file = False
-        try:
-            if isfile(self._normalize(reference_image)):
-                is_file = True
-        except InvalidImageException:
-            pass
-        reference_image = self._normalize(reference_image)
 
+        try:
+            normalized = self._normalize(reference_image_folder)
+        except InvalidImageException:
+            pass
+        if isdir(normalized):
+            is_dir = True
+        is_file = False
+        if isfile(normalized):
+            is_file = True
+        reference_image = normalized
         reference_images = []
         if is_file:
             reference_images = [reference_image]
         elif is_dir:
-            for f in listdir(self._normalize(reference_image)):
+            for f in listdir(normalized):
                 if not isfile(self._normalize(path_join(reference_image, f))):
-                    raise InvalidImageException(
-                                            self._normalize(reference_image))
+                    raise InvalidImageException(normalized)
                 reference_images.append(path_join(reference_image, f))
         return reference_images
 
@@ -118,8 +107,9 @@ class RecognizeImage():
         Returns Python tuple ``(x, y)`` of the coordinates matching
         the center point of the reference image.
         """
-        if isfile(reference_image):
-            raise FileNotFoundError(f'Image file not found: "{reference_image}"')
+        images = self._get_reference_images(reference_image)
+        reference_image = images[0]
+        print(reference_image)
         stop_time = int(time()) + int(timeout)
         location = None
         # with self._suppress_keyword_on_failure():
@@ -130,6 +120,6 @@ class RecognizeImage():
             except ImageNotOnScreenException:
                 pass
         if location is None:
-            raise ImageNotOnScreenException(self._normalize(reference_image))
+            raise ImageNotOnScreenException(reference_image)
         LOGGER.info(f'Image "{reference_image}" found at {location}')
         return location

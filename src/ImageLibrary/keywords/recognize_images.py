@@ -19,7 +19,8 @@ class RecognizeImagesKeywords(object):
         ``reference_image`` is automatically normalized as described in the
         `Reference image names`.
 
-        ``additional_timeoute`` optional value added to default timeout, in whole seconds. default is 0
+        ``additional_timeoute`` optional value added to default timeout, in whole seconds. 
+            default is 0
         """
         timeout = self.recognitions.timeout + additional_timeoute
         center_location = self.recognizer.wait_for(reference_image, timeout)
@@ -27,12 +28,10 @@ class RecognizeImagesKeywords(object):
         ag.click(center_location)
         return center_location
 
-    @keyword
     def _click_to_the_direction_of(self, direction, location, offset, 
                                    clicks, button, interval):
         raise NotImplementedError('This is defined in the main class.')
 
-    @keyword
     def _locate_and_click_direction(self, direction, reference_image, offset,
                                     clicks, button, interval, timeout):
         location = self.recognizer.wait_for(reference_image, timeout)

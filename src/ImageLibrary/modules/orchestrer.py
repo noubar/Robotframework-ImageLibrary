@@ -54,11 +54,11 @@ class Orchesterer:
                      edge_high_threshold, timeout):
             self.initial_confidence = confidence
             self.timeout = timeout
-            self.set_strategy(strategy, edge_sigma, edge_low_threshold,
-                              edge_high_threshold, confidence)
             self.needle_edge = None
             self.haystack_edge = None
             self.peakmap = None
+            self.set_strategy(strategy, edge_sigma, edge_low_threshold,
+                              edge_high_threshold, confidence)
 
         def set_strategy(self, strategy, edge_sigma=2.0, edge_low_threshold=0.1,
                          edge_high_threshold=0.3, confidence=0.99):
@@ -76,16 +76,16 @@ class Orchesterer:
             Both strategies can optionally be initialized with a new confidence."""
 
             self.strategy = strategy
+            self.confidence = confidence
             if strategy == 'default':
                 self.strategy = _StrategyPyautogui(self)
             elif strategy == 'edge':
-                self.strategy = _StrategySkimage(self)
                 self.edge_sigma = edge_sigma
                 self.edge_low_threshold = edge_low_threshold
                 self.edge_high_threshold = edge_high_threshold
+                self.strategy = _StrategySkimage(self)
             else:
                 raise StrategyException(strategy)
-            self.confidence = confidence
             # Linking protectelocate to the strategy's method
             self.try_locate = self.strategy.try_locate
 
