@@ -17,9 +17,10 @@ namespace WpfApplication
         private DateTime DownTime;
         private DateTime UpTime;
 
-        public MainWindow()
+        public MainWindow(int selectedTab=0)
         {
             InitializeComponent();
+            MainTabControl.SelectedIndex = selectedTab;
             var vm = new MainViewModel();
             DataContext = vm;
         }

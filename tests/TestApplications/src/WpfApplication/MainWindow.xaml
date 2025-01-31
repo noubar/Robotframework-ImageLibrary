@@ -32,7 +32,7 @@
         <StatusBar DockPanel.Dock="Bottom">
             <StatusBarItem />
         </StatusBar>
-        <TabControl>
+        <TabControl x:Name="MainTabControl">
             <TabItem AutomationProperties.AutomationId="SimpleControl" Header="Simple Controls">
                 <StackPanel Orientation="Vertical">
                     <Label Content="Test Label" Foreground="Blue" />
