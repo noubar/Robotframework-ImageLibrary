@@ -65,7 +65,7 @@ class Orchesterer:
             """Changes the way how images are detected on the screen. 
             This can also be done globally during `Importing`.
             Strategies:
-            - ``default``
+            - ``default`` - image recognition with pyautogui
             - ``edge`` - Advanced image recognition options with canny edge detection
 
             The ``edge`` strategy allows these additional parameters:

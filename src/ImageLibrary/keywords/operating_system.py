@@ -1,4 +1,4 @@
-from ..modules.interaction.operating_system import OperatingSystem
+from ..modules.interaction.os import OperatingSystem
 from robot.api.deco import keyword
 from robot.api import logger as LOGGER
 

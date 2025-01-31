@@ -1,8 +1,8 @@
 import pyautogui as ag
 from robot.api import logger as LOGGER
 from robot.api.deco import keyword
-from ..modules.interaction.operating_system import OperatingSystem
-from ..modules.recognition.recognize_images import RecognizeImage
+from ..modules.interaction.os import OperatingSystem
+from ..modules.recognition.images import RecognizeImage
 from ..modules.errors import ImageNotOnScreenException
 
 class RecognizeImagesKeywords(object):
