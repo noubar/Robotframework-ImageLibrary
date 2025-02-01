@@ -44,6 +44,7 @@ class Orchesterer:
             self.is_mac = utils.is_mac()
             self.is_linux = utils.is_linux()
             self.has_retina = utils.has_retina()
+            self.name = utils.platform_name()
 
     class Recognitions:
         """

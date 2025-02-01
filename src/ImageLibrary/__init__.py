@@ -87,9 +87,9 @@ class ImageLibrary(DynamicCore):
     Using good names for reference images is evident from easy-to-read test
     data:
 
-    | `Import Library` | ImageLibrary                   | reference_folder=images |                                                            |
-    | `Click Image`    | popup Window title                    |                         | # Path is images/popup_window_title.png                    |
-    | `Click Image`    | button Login Without User Credentials |                         | # Path is images/button_login_without_user_credentials.png |
+    | `Import Library` | ImageLibrary                   | reference_folder=images | |
+    | `Click Image`    | popup Window title                    | | # Path is images/popup_window_title.png                    |
+    | `Click Image`    | button Login Without User Credentials | | # Path is images/button_login_without_user_credentials.png |
 
     == Recognition strategies ==
     Basically, image recognition works by searching a reference image on the 
@@ -207,12 +207,11 @@ class ImageLibrary(DynamicCore):
 
     | ${location}=           | `Wait For`  | label Name |
     | `Click To The Left Of` | ${location} | 200        |
-    """    
+    """
 
     ROBOT_LIBRARY_SCOPE = 'Global'
     ROBOT_LIBRARY_VERSION = VERSION
     ROBOT_LISTENER_API_VERSION = 2
-
     def __init__(self, reference_folder=None, screenshot_folder=None,
                  keyword_on_failure='Take Screenshot',
                  confidence=0.99, strategy='default',
@@ -252,7 +251,6 @@ class ImageLibrary(DynamicCore):
         self.recognitions = Orchesterer.Recognitions(confidence, strategy, edge_sigma,
                                                         edge_low_threshold, edge_high_threshold,
                                                         recognition_timeout)
-        
         libraries = [KeyboardKeywords(),
                     MouseKeywords(),
                     ScreenshotKeywords(self.screenshots),
@@ -260,6 +258,8 @@ class ImageLibrary(DynamicCore):
                     RecognizeImagesKeywords(self.defaults, self.platform, self.recognitions),
                     OrganizeKeywords(self.defaults, self.platform, self.recognitions, self.screenshots)
                     ]
+        self.builtin = BuiltIn()
+        self.set_robot_vars()
         DynamicCore.__init__(self, libraries)
 
     def run_keyword(self, name, args, kwargs=None):
@@ -274,7 +274,7 @@ class ImageLibrary(DynamicCore):
         if not self.defaults.keyword_on_failure:
             return
         try:
-            BuiltIn().run_keyword(self.defaults.keyword_on_failure)
+            self.builtin.run_keyword(self.defaults.keyword_on_failure)
         except Exception as e:
             LOGGER.debug(e)
             LOGGER.warn('Failed to run keyword_on_failure in imagelibrary.'
@@ -283,3 +283,7 @@ class ImageLibrary(DynamicCore):
     def _start_test(self, name, attrs):  # pylint: disable=unused-argument
         self.screenshots.set_name(name)
         self.screenshots.counter = 1
+
+    def set_robot_vars(self):
+        "here list of all global vars available in robot if this library importedc"
+        self.builtin.set_global_variable("$PLATFORM_NAME",self.platform.name)

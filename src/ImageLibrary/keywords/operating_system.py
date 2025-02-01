@@ -104,3 +104,14 @@ class OperatingSystemKeywords(object):
         Presses ctrl/command+v to paste.
         """
         self.module.paste()
+
+    @keyword
+    def get_platform_name(self):
+        """
+        returns one of [windows,linux,mac] according your os
+        """
+        return self.module.platform.name
+
+    @keyword
+    def parse_path(self, path):
+        os.path

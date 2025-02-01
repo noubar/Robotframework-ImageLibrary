@@ -51,3 +51,13 @@ class Utils():
             return call("system_profiler SPDisplaysDataType | grep 'Retina'", shell=True) == 0
         return False
 
+    def platform_name(self):
+        """returns name of current paltform: windows, mac, linux, or None"""
+        name = None
+        if self.is_linux():
+            name = 'linux'
+        elif self.is_windows():
+            name = 'windows'
+        elif self.is_mac():
+            name = 'mac'
+        return name
