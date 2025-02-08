@@ -18,3 +18,4 @@ dist
 tests/TestApplications/src/*/bin
 tests/TestApplications/src/*/obj
 tests/TestApplications/.vs
+tests/TestApplications/src/KeyboardTestConsole/Properties/PublishProfiles
