@@ -1,7 +1,8 @@
 import pyautogui as ag
-ag.FAILSAFE = False
-from ..errors import MouseException
 from robot.api import logger as LOGGER
+from ...keywords.inputhandle.mouseinput import Orthogonal, Cardinal
+
+ag.FAILSAFE = False
 
 class Mouse:
     """
@@ -9,7 +10,7 @@ class Mouse:
     """
 
     @staticmethod
-    def click_to_direction_of(direction, offset, clicks, button, interval, *coordinates):
+    def click_to_direction_of(direction, offset, clicks, button, interval, coordinates):
         """
         Clicks at a specified location in a given direction with a specified mouse button.
         Args:
@@ -28,28 +29,22 @@ class Mouse:
             # at an interval of 0.5 seconds.
                                    clicks, button, interval):
         """
-        location = Extras.validate_coordinates(coordinates)
-        x, y = Extras.get_location_according_direction(direction, location, offset)
-        try:
-            clicks = int(clicks)
-        except ValueError as e:
-            raise MouseException('Invalid argument "%s" for `clicks`') from e
-        if button not in ['left', 'middle', 'right']:
-            raise MouseException(f'Invalid button "{button}" for `button`')
-        try:
-            interval = float(interval)
-        except ValueError as e:
-            raise MouseException('Invalid argument "%s" for `interval`') from e
+        if isinstance(direction, Orthogonal):
+            x, y = Extras.get_location_according_direction(direction, coordinates, offset)
+        elif  isinstance(direction, Cardinal):
+            x, y = Extras.get_location_according_diagonal_direction(direction, coordinates, offset)
+        else:
+            raise ValueError("Invalid direction type. Must be Orthogonal or Cardinal -MouseInput.")
         LOGGER.info(f'Clicking {clicks} time(s) at ({x}, {y}) with '
                     f'{button} mouse button at interval {interval}')
         ag.click(x, y, clicks=clicks, button=button, interval=interval)
+
 
     @staticmethod
     def move_to(*coordinates, duration=0.0):
         """
         TODO Doc
         """
-        coordinates = Extras.validate_coordinates(coordinates)
         ag.moveTo(coordinates, duration=duration)
 
     @staticmethod
@@ -57,7 +52,6 @@ class Mouse:
         """
         TODO Doc
         """
-        coordinates = Extras.validate_coordinates(coordinates)
         ag.mouseUp(coordinates, button=button)
 
     @staticmethod
@@ -65,7 +59,6 @@ class Mouse:
         """
         TODO Doc
         """
-        coordinates = Extras.validate_coordinates(coordinates)
         ag.mouseDown(coordinates, button=button)
 
     @staticmethod
@@ -73,7 +66,6 @@ class Mouse:
         """
         TODO Doc
         """
-        coordinates = Extras.validate_coordinates(coordinates)
         ag.click(*coordinates, button=button)
 
     @staticmethod
@@ -81,7 +73,6 @@ class Mouse:
         """
         TODO Doc
         """
-        coordinates = Extras.validate_coordinates(coordinates)
         ag.doubleClick(coordinates, interval=interval, button=button)
 
     @staticmethod
@@ -89,7 +80,6 @@ class Mouse:
         """
         TODO Doc
         """
-        coordinates = Extras.validate_coordinates(coordinates)
         ag.tripleClick(coordinates, interval=interval, button=button)
 
     @staticmethod
@@ -97,7 +87,6 @@ class Mouse:
         """
         TODO Doc
         """
-        coordinates = Extras.validate_coordinates(coordinates)
         ag.mouseDown(coordinates, button=button)
         ag.sleep(time)
         ag.mouseUp(button=button)
@@ -107,7 +96,6 @@ class Mouse:
         """
         TODO Doc
         """
-        coordinates = Extras.validate_double_coordinates(coordinates)
         ag.mouseDown(coordinates[0], button=button)
         ag.moveTo(coordinates[1], duration=duration)
         ag.mouseUp(coordinates[1], button=button)
@@ -117,74 +105,13 @@ class Mouse:
         """
         TODO Doc
         """
-        coordinates = Extras.validate_coordinates(coordinates)
         ag.scroll(amount, coordinates[0], coordinates[1])
 
+
 class Extras:
-    @staticmethod
-    def validate_double_coordinates(coordinates):
-        """
-        Takes either tuple, list, or dictionary and returns a tuple of integers.
-        all valid input output examples:
-            ({'x': '100', 'y': '200'}, {'x': '300', 'y': '400'}) to ((100,200), (300,400))
-        	(['100', '200'], ['300', '400']) to ((100,200), (300,400))
-            ((100, 200), (300, 400)) to ((100,200), (300,400))
-            ('100', '200', '300', '400') to ((100,200), (300,400))
-            ('100,200', '100,200') to ((100,200), (100,200))
-            ('x=100', 'y=200', 'x=300', 'y=400') to ((100,200), (300,400))
-        examples are fed to validate_coordinates"""
-        if isinstance(coordinates, (list, tuple)):
-            coords = ()
-            if len(coordinates) == 2:
-                coords = (Extras.validate_coordinates((coordinates[0],)), Extras.validate_coordinates((coordinates[0],)))
-            elif len(coordinates) == 4:
-                coords = (Extras.validate_coordinates(coordinates[:2]), Extras.validate_coordinates(coordinates[2:]))
-            else:
-                raise MouseException('Invalid number of coordinates. Please give either pair of (x, y) or pair x, y.')
-            return coords
-        else:
-            raise MouseException('Invalid type of coordinates. Please give either pair of (x, y), [x, y], {"x": x, "y": y}, or "x=value, y=value".')
 
     @staticmethod
-    def validate_coordinates(coordinates):
-        """
-        Takes either tuple of tuple, list, str, or dictionary and returns a tuple of integers.
-        all valid input output examples:
-        (100,200) to (100,200)
-        [100,200] to (100,200)
-        ({'x': '400', 'y': '400'},)  to (400,400)
-        ('200,200',) to (200,200)
-        (['500', '500'],) to (500,500)
-        ((300, 300),)  to (300,300)
-        ('200', '200') to (200,200)
-        ('x=100', 'y=100') to (100,100)
-        """
-        if isinstance(coordinates, (list, tuple)):
-            if len(coordinates) == 1 and isinstance(coordinates[0], (list, tuple, dict, str)):
-                coordinates = coordinates[0]
-            if isinstance(coordinates, dict):
-                try:
-                    coordinates = (coordinates['x'], coordinates['y'])
-                except KeyError:
-                    raise MouseException('Dictionary must have keys "x" and "y"') from None
-            elif isinstance(coordinates, str):
-                print("iam in str")
-                coordinates = coordinates.split(',')
-            elif len(coordinates) != 2:
-                raise MouseException('Invalid number of coordinates. Please give either (x, y) or x, y.')
-            elif isinstance(coordinates[0], str) and (coordinates[0].startswith('x=') or coordinates[0].startswith('y=')):
-                values = {item.split('=')[0]: int(item.split('=')[1]) for item in coordinates}
-                coordinates = (values['x'], values['y'])
-            try:
-                coordinates = tuple(int(coord) for coord in coordinates)
-            except ValueError as e:
-                raise MouseException(f'Coordinates {coordinates} are not integers') from e
-            return coordinates
-        else:
-            raise MouseException('Invalid type of coordinates. Please give either (x, y), [x, y], {"x": x, "y": y}, or "x=value, y=value".')
-
-    @staticmethod
-    def get_location_according_direction(direction, location, offset):
+    def get_location_according_direction(direction:Orthogonal, location, offset):
         """ 
         Calculate a new location based on the given direction and offset.
         Args:
@@ -193,16 +120,45 @@ class Extras:
             location (tuple): A tuple (x, y) representing the current location.
             offset (int): The distance to move in the specified direction.
         Returns:
-            tuple: A tuple (x, y) representing the new location after moving in the specified direction by the given offset.
+            tuple: A tuple (x, y) representing the new location after 
+            moving in the specified direction by the given offset.
         """
         x, y = location
         offset = int(offset)
-        if direction == 'left':
-            x = x - offset
-        if direction == 'up':
-            y = y - offset
-        if direction == 'right':
-            x = x + offset
-        if direction == 'down':
-            y = y + offset
+        if direction == Orthogonal.left:
+            x -= offset
+        elif direction == Orthogonal.up:
+            y -= offset
+        elif direction == Orthogonal.right:
+            x += offset
+        elif direction == Orthogonal.down:
+            y += offset
+        return x, y
+
+    @staticmethod
+    def get_location_according_diagonal_direction(direction:Cardinal, location, offset):
+        """ 
+        Calculate a new location based on the given diagonal direction and offset.
+        Args:
+            direction (Extras.Cardinal): The diagonal direction to move from the current location.
+            location (tuple): A tuple (x, y) representing the current location.
+            offset (int): The distance to move in the specified direction.
+        Returns:
+            tuple: A tuple (x, y) representing the new location after 
+            moving in the specified direction by the given offset.
+        """
+        x, y = location
+        offset = int(offset)
+        if direction == Cardinal.upperleft:
+            x -= offset
+            y += offset
+        elif direction == Cardinal.upperright:
+            x += offset
+            y += offset
+        elif direction == Cardinal.lowerright:
+            x += offset
+            y -= offset
+        elif direction == Cardinal.lowerleft:
+            x -= offset
+            y -= offset
         return x, y

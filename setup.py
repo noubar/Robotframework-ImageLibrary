@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 from os.path import abspath, dirname, join as path_join
 from setuptools import setup, find_packages
 from src.ImageLibrary.version import VERSION

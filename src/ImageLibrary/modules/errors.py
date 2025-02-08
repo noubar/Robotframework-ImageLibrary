@@ -1,7 +1,13 @@
-# -*- coding: utf-8 -*-
+class ExceptionBuilder:
+    def __init__(self, exception: type[Exception], message: str, *args):
+        formatted_message = message.format(*args)
+        raise exception(formatted_message)
+    
 class ImageLibraryError(ImportError):
     pass
 
+class LibraryImportError(ImportError):
+    pass
 
 class ImageNotOnScreenException(Exception):
     def __init__(self, image_name):
@@ -55,4 +61,5 @@ class InvalidAlias(Exception):
         self.value = value
 
     def __str__(self):
-        return (f'The given alias"{self.value}" is invalid or not launched yet using this library.')
+        return (f'The given alias"{self.value}" is invalid '
+                'or not launched yet using this library.')

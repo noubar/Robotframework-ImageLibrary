@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 from contextlib import contextmanager
 from robotlibcore import DynamicCore
 
@@ -7,30 +7,30 @@ from .modules.errors import *    # import errors before checking dependencies!
 try:
     import pyautogui as ag
 except ImportError as e:
-    raise ImageLibraryError('There is something wrong with pyautogui or '
+    raise LibraryImportError('There is something wrong with pyautogui or '
                                    'it is not installed.') from e
 try:
     from robot.api import logger as LOGGER
     from robot.libraries.BuiltIn import BuiltIn
 except ImportError as e:
-    raise ImageLibraryError('There is something wrong with '
+    raise LibraryImportError('There is something wrong with '
                                    'Robot Framework or it is not installed.') from e
 try:
     from tkinter import Tk as TK
 except ImportError as e:
-    raise ImageLibraryError('There is either something wrong with '
+    raise LibraryImportError('There is either something wrong with '
                                    'Tkinter or you are running this on Java, '
                                    'which is not a supported platform. Please '
                                    'use Python and verify that Tkinter works.') from e
 try:
     import skimage
 except ImportError as e:
-    raise ImageLibraryError('There is either something wrong with skimage '
+    raise LibraryImportError('There is either something wrong with skimage '
                                     '(scikit-image) or it is not installed.') from e
 try:
     import cv2
 except ImportError as e:
-    raise ImageLibraryError('There is either something wrong with cv2 '
+    raise LibraryImportError('There is either something wrong with cv2 '
                                     '(opencv-python) or it is not installed.') from e
 
 from .keywords import(KeyboardKeywords,
@@ -40,7 +40,6 @@ from .keywords import(KeyboardKeywords,
                       OrganizeKeywords,
                       MouseKeywords)
 
-from .modules.utils import *
 from .version import VERSION
 from .modules.orchestrer import Orchesterer
 

@@ -1,6 +1,8 @@
-# -*- coding: utf-8 -*-
-from ..modules.interaction.keyboard import Keyboard
 from robot.api.deco import keyword
+from .inputhandle.commoninput import CommonInput
+from .inputhandle.inputerrors import KeyboardInputException
+from .inputhandle.keyboardinput import KeyboardInput
+from ..modules.interaction.keyboard import Keyboard
 
 class KeyboardKeywords:
     """
@@ -30,7 +32,8 @@ class KeyboardKeywords:
         [https://pyautogui.readthedocs.org/en/latest/keyboard.html#keyboard-keys|
         See valid keyboard keys here].
         """
-        self.module.press_keys(*keys, pause=pause)
+        self.module.press_keys(KeyboardInput.validate_keys(keys),
+                            pause=CommonInput.validate_float(pause, KeyboardInputException.Pause))
 
     @keyword
     def press_and_hold(self, time, *keys, repeated=True):
@@ -53,7 +56,8 @@ class KeyboardKeywords:
         [https://pyautogui.readthedocs.org/en/latest/keyboard.html#keyboard-keys|
         See valid keyboard keys here].
         """
-        self.module.press_and_hold(time, *keys, repeated=repeated)
+        self.module.press_and_hold(time, KeyboardInput.validate_keys(keys),
+                            repeated=CommonInput.validate_bool(repeated, KeyboardInputException.Repeated))
 
     @keyword
     def press_and_hold_together(self, time, *keys, repeated=True):
@@ -74,14 +78,15 @@ class KeyboardKeywords:
         [https://pyautogui.readthedocs.org/en/latest/keyboard.html#keyboard-keys|
         See valid keyboard keys here].
         """
-        self.module.press_and_hold_all(time, *keys, repeated=repeated)
+        self.module.press_and_hold_all(CommonInput.validate_float(time,KeyboardInputException.HoldTime),
+                                       KeyboardInput.validate_keys(keys), repeated=repeated)
 
     @keyword
     def type(self, *keys_or_text):
-        """Type text and keyboard keys.
+        """Types text and keyboard keys. Both are possible
         
-        you need to defferentiate between text and keys by using Key prefix.
-        keys are case-insensitive bu text is case-sensitive.
+        you need to defferentiate between text and keys by using 'Key.' prefix.
+        keys are case-insensitive but text is case-sensitive.
 
         See valid keyboard keys in `Press Combination`.
 
@@ -91,19 +96,21 @@ class KeyboardKeywords:
         | Type | Submit this with enter | Key.enter |              |
         | Type | key.windows            | notepad   | Key.enter    |
         """
-        self.module.type(*keys_or_text)
+        self.module.type(KeyboardInput.validate_keys_or_text(keys_or_text))
 
     @keyword
     def type_with_keys_down(self, text, *keys):
-        """Press keyboard keys down, then write given text, then release the
+        """Press keyboard keys down, then write/type the given text, then release the
         keyboard keys. 
+
+        this keyword takes one text or char but several keys
 
         See valid keyboard keys in `Press Combination`.
 
         Examples:
 
-        | Type with keys down | write this in caps  | Key.Shift |
-        | Type with keys down | l | key.ctrl | Key.Shift | 
+        | Type with keys down | write this in caps  | Shift |
+        | Type with keys down | l | ctrl | Shift |
 
         """
-        self.module.type_with_keys_down(text, *keys)
+        self.module.type_with_keys_down(text, KeyboardInput.validate_keys(keys))

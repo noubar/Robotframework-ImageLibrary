@@ -1,12 +1,12 @@
 
+from time import time, sleep
+from tkinter import Tk as TK
+import os
 import subprocess
 import psutil
 import pyautogui as ag
-from tkinter import Tk as TK
 from .keyboard import Keyboard
 from ..errors import OSException,InvalidAlias
-from robot.api import logger
-from time import time, sleep
 
 class OperatingSystem:
     """
@@ -30,14 +30,14 @@ class OperatingSystem:
         """Executes ``Ctrl+C`` on Windows and Linux, ``⌘+C`` on OS X and
         returns the content of the clipboard."""
         key = 'command' if self.platform.is_mac else 'ctrl'
-        Keyboard.press_keys(key, 'c')
+        Keyboard.press_keys([key, 'c'])
         return self.get_clipboard_content()
 
     def paste(self):
         """Executes ``Ctrl+C`` on Windows and Linux, ``⌘+C`` on OS X and
         returns the content of the clipboard."""
         key = 'command' if self.platform.is_mac else 'ctrl'
-        Keyboard.press_keys(key, 'v')
+        Keyboard.press_keys([key, 'v'])
         return True
 
     def get_clipboard_content(self):
@@ -56,7 +56,7 @@ class OperatingSystem:
         ag.alert(text='Test execution paused.', title='Pause',
                  button='Continue')
 
-    def terminate_process(self, alias=None):
+    def terminate_subprocess(self, alias=None, kill=False):
         """Terminates the process launched with `Launch Application` with
         given ``alias``.
 
@@ -72,9 +72,12 @@ class OperatingSystem:
             except KeyError as e:
                 raise OSException('`Terminate Application` called without '
                                   '`Launch Application` called first.') from e
-        process.terminate()
+        if kill:
+            process.kill()
+        else:
+            process.terminate()
 
-    def launch_app(self, appandargs:list, process_name, timeout=60, alias=None):
+    def launch_app(self, path, args:list, process_name, timeout=10, alias=None):
         """Launches an application. and awaits the process to start.
             It will not check if the process is already running.
 
@@ -96,13 +99,22 @@ class OperatingSystem:
         Automatically generated alias can be overridden by providing ``alias``
         yourself.
         """
-        alias = self.subprocess(appandargs, alias)
+        # Check if the path is absolute and enclose in double quotes if on Windows
+        # On macOS, if it's an .app bundle, use `open`
+        if not alias:
+            alias = str(len(self.defaults.open_applications))
+        if self.platform.is_mac and path.endswith(".app"):
+           process = subprocess.Popen(["open", path, "--args"] + list(args))
+        elif self.platform.is_windows:
+            process = subprocess.Popen(["start", path] + list(args), shell=True)
+        else:
+            process = subprocess.Popen([path] + list(args))
         start_time = time()
         while time() - start_time < timeout:
             # Check all running processes
             for proc in psutil.process_iter(attrs=['name','status']):
-                print(proc, ": ",proc.info['name'])
                 if proc.info['name'] == process_name and proc.info['status'] == 'running':
+                    self.defaults.open_applications[alias] = process
                     return alias
             sleep(1)  # Wait before checking again
         self.defaults.open_applications.pop(alias, None)
@@ -134,15 +146,18 @@ class OperatingSystem:
         self.defaults.open_applications[alias] = process
         return alias
 
-    def get_pid_of_launched_app(self, alias):
+    def get_pid_of_subprocess(self, alias=None):
         """
         TODO Doc
+        pid of last subprocess or pid of subprocess with the given alias
         """
-        if alias not in self.defaults.open_applications:
+        if alias and alias not in self.defaults.open_applications:
             raise InvalidAlias(alias)
+        else:
+            alias = str(len(self.defaults.open_applications))
         return self.defaults.open_applications[alias].pid
 
-    def get_all_launched_apps(self):
+    def get_all_subprocesses(self):
         """
         TODO Doc
         """
@@ -150,3 +165,13 @@ class OperatingSystem:
         for alias, process in self.defaults.open_applications.items():
             return_list[alias] = process.pid
         return return_list
+
+    def abspath(self, relpath, validate:bool):
+        """
+        TODO Doc
+        """
+        path = os.path.abspath(relpath)
+        if validate:
+            if not os.path.isdir(path) and os.path.isfile(path):
+                raise OSException()
+            return path.abspath(relpath)

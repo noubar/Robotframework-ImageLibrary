@@ -1,9 +1,11 @@
 from collections import OrderedDict
-from .utils import Utils
-# import inspect
-from .errors import ReferenceFolderException, StrategyException
+from platform import platform
 from os.path import isdir
+from subprocess import call
+from .errors import ReferenceFolderException, StrategyException
 from .recognition.strategies import _StrategyPyautogui, _StrategySkimage
+
+
 
 class Orchesterer:
     """
@@ -38,8 +40,68 @@ class Orchesterer:
         """
         TODO Doc
         """
+        class Utils():
+            """
+            A class containing utility functions for checking the current platform and
+            determining if it has a retina display.
+            """
+
+            def __init__(self):
+                self.platform = platform()
+
+            def is_windows(self):
+                """
+                Checks if the current platform is Windows.
+                :return: True if the platform is Windows, False otherwise.
+                """
+                return self.platform.lower().startswith('windows')
+
+
+            def is_mac(self):
+                """
+                Checks if the current platform is macOS.
+                :return: True if the platform is macOS, False otherwise.
+                """
+                return self.platform.lower().startswith('darwin')
+
+
+            def is_linux(self):
+                """
+                Checks if the current platform is linux.
+                :return: True if the platform is linux, False otherwise.
+                """
+                return self.platform.lower().startswith('linux')
+
+
+            def is_java(self):
+                """
+                Checks if the current platform is java.
+                """
+                return self.platform.lower().startswith('java')
+
+            def has_retina(self):
+                """
+                Checks if the current platform has a retina display.
+                :return: True if the platform has a retina display, False otherwise.
+                """
+                if self.is_mac():
+                    # Will return 0 if there is a retina display
+                    return call("system_profiler SPDisplaysDataType | grep 'Retina'", shell=True) == 0
+                return False
+
+            def platform_name(self):
+                """returns name of current paltform: windows, mac, linux, or None"""
+                name = None
+                if self.is_linux():
+                    name = 'linux'
+                elif self.is_windows():
+                    name = 'windows'
+                elif self.is_mac():
+                    name = 'mac'
+                return name
+
         def __init__(self):
-            utils = Utils()
+            utils = self.Utils()
             self.is_windows = utils.is_windows()
             self.is_mac = utils.is_mac()
             self.is_linux = utils.is_linux()

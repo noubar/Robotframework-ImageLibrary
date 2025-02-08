@@ -1,6 +1,7 @@
 from ..modules.interaction.os import OperatingSystem
 from robot.api.deco import keyword
 from robot.api import logger as LOGGER
+import os
 
 class OperatingSystemKeywords(object):
     """
@@ -38,7 +39,7 @@ class OperatingSystemKeywords(object):
         self.module.subprocess(list(appandargs), alias=alias)
 
     @keyword
-    def launch_app(self, *appandargs, name=None, alias=None, timeout=10):
+    def launch_app(self, path, *args, name=None, alias=None, timeout=10):
         """starts a process. 
 
         Executes the string argument ``app`` as a separate process with
@@ -47,7 +48,7 @@ class OperatingSystemKeywords(object):
         module. It should therefore be the exact command you would use to
         launch the application from command line.
 
-        On Windows, if you are using relative or absolute paths in ``app``,
+        First arg should be the path of the app wanted to be lunched.
         enclose the command with double quotes:
 
         | Launch App | "C:\\my folder\\myprogram.exe" | # Needs quotes       |
@@ -63,45 +64,60 @@ class OperatingSystemKeywords(object):
         Application` keyword.
 
         """
-        name = name if name else appandargs[0]
-        self.module.launch_app(list(appandargs), name, alias=alias, timeout=timeout)
+        name = name if name else os.path.basename(path)
+        path = os.path.abspath(path)
+        if not os.path.exists(path):
+            raise FileNotFoundError(f"The specified path does not exist: {path}")
+        self.module.launch_app(path, args, process_name=name, alias=alias, timeout=timeout)
 
     @keyword
-    def terminate_subprocess(self, alias=None):
-        """Terminates the process launched with `Launch Application` with
-        given ``alias``.
+    def terminate_subprocess(self, alias=None, kill=False):
+        """Terminates the process launched with `Launch App` or `start subprocess` with
+        given ``alias`` or the last one.
 
         If no ``alias`` is given, terminates the last process that was
         launched.
         """
-        self.module.terminate_process(alias)
+        self.module.terminate_subprocess(alias, kill)
 
     @keyword
-    def get_pid_of_launched_app(self, alias):
+    def kill_app(self, alias=None):
+        """Terminates the process launched with `Launch App` or `start subprocess` with
+        given ``alias`` or the last one.
+        difference from `terminate subprocess` makes sure that process is not running anymore
+        it tryes to terminate if not kill if not then force kill 
+
+        If no ``alias`` is given, terminates the last process that was
+        launched.
         """
-        Takes the alias and returns the process id of the launched application.
+        self.module.terminate_subprocess(alias)
+
+    @keyword
+    def get_pid_of_subprocess(self, alias):
+        """
+        Takes the alias and returns the process id of thesubprocess or launched application.
         The app should be launched with `Launch Application` keyword.
         """
-        return self.module.get_pid_of_launched_app(alias)
+        return self.module.get_pid_of_subprocess(alias)
 
     @keyword
-    def get_pid_of_all_launched_apps(self):
+    def get_pid_of_all_subprocesses(self):
         """
-        Returns the process id of all the launched applications.
+        Returns the process id of all the subprocesses and launched applications.
         """
-        return self.module.get_all_launched_apps()
+        return self.module.get_all_subprocesses()
 
     @keyword
     def copy(self):
         """
-        Presses ctrl/command+c to copy.
+        Presses ctrl/command + c to copy.
         """
         self.module.copy()
 
     @keyword
     def paste(self):
         """
-        Presses ctrl/command+v to paste.
+        Presses ctrl/command + v to paste.
         """
         self.module.paste()
 
@@ -113,5 +129,21 @@ class OperatingSystemKeywords(object):
         return self.module.platform.name
 
     @keyword
-    def parse_path(self, path):
-        os.path
+    def pause_popup(self):
+        """
+        Shows a dialog that must be dismissed with manually clicking.
+
+        This is mainly for when you are developing the test case and want to
+        stop the test execution.
+
+        It should probably not be used otherwise.
+        """
+        self.module.pause()
+
+    @keyword
+    def normalize_path(self, relpath, validate=False):
+        """
+        Takes relative path and return an abstract full path.
+        if validate is true checks also if the path isfile or isdir and its exists
+        """
+        self.module.abspath(relpath, validate)

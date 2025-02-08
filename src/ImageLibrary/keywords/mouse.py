@@ -1,6 +1,8 @@
-# -*- coding: utf-8 -*-
 from ..modules.interaction.mouse import Mouse
 from robot.api.deco import keyword
+from .inputhandle.mouseinput import Orthogonal, Cardinal, MouseInput
+from .inputhandle.commoninput import CommonInput
+from .inputhandle.inputerrors import MouseInputException
 
 class MouseKeywords(object):
 
@@ -30,8 +32,12 @@ class MouseKeywords(object):
         | @{coordinates}= | Create List | ${600} | ${500} |
         | Click Above Of | 100 | ${coordinates} | |
         '''
-        self.module.click_to_direction_of('up', offset,
-                                        clicks, button, interval, *coordinates)
+        self.module.click_to_direction_of(Orthogonal.up,
+                                        CommonInput.validate_int(offset, MouseInputException.OffsetValue),
+                                        CommonInput.validate_int(clicks, MouseInputException.ClicksCount),
+                                        MouseInput.validate_button(button), 
+                                        CommonInput.validate_float(interval, MouseInputException.IntervalValue),
+                                        MouseInput.validate_coordinates(coordinates))
 
     @keyword
     def click_below_of(self, offset, *coordinates, clicks=1,
@@ -41,8 +47,12 @@ class MouseKeywords(object):
         Example:
         See argument documentation in `Click Above Of`.
         '''
-        self.module.click_to_direction_of('down', offset,
-                                        clicks, button, interval, *coordinates)
+        self.module.click_to_direction_of(Orthogonal.down,
+                                        CommonInput.validate_int(offset, MouseInputException.OffsetValue),
+                                        CommonInput.validate_int(clicks, MouseInputException.ClicksCount),
+                                        MouseInput.validate_button(button), 
+                                        CommonInput.validate_float(interval, MouseInputException.IntervalValue),
+                                        MouseInput.validate_coordinates(coordinates))
 
     @keyword
     def click_left_of(self, offset, *coordinates, clicks=1,
@@ -52,19 +62,73 @@ class MouseKeywords(object):
         Example:
         See argument documentation in `Click Above Of`.
         '''
-        self.module.click_to_direction_of('left', offset,
-                                        clicks, button, interval, *coordinates)
+        self.module.click_to_direction_of(Orthogonal.left,
+                                        CommonInput.validate_int(offset, MouseInputException.OffsetValue),
+                                        CommonInput.validate_int(clicks, MouseInputException.ClicksCount),
+                                        MouseInput.validate_button(button), 
+                                        CommonInput.validate_float(interval, MouseInputException.IntervalValue),
+                                        MouseInput.validate_coordinates(coordinates))
 
     @keyword
-    def click_right_of(self, offset, *coordinates, clicks=1,
+    def click_upper_right_of(self, offset, *coordinates, clicks=1,
                               button='left', interval=0.0):
         '''Clicks right of given location by given offset.
 
         Example:
         See argument documentation in `Click Above Of`.
         '''
-        self.module.click_to_direction_of('right', offset,
-                                        clicks, button, interval, *coordinates)
+        self.module.click_to_direction_of(Cardinal.upperright,
+                                        CommonInput.validate_int(offset, MouseInputException.OffsetValue),
+                                        CommonInput.validate_int(clicks, MouseInputException.ClicksCount),
+                                        MouseInput.validate_button(button),
+                                        CommonInput.validate_float(interval, MouseInputException.IntervalValue),
+                                        MouseInput.validate_coordinates(coordinates))
+
+    @keyword
+    def click_upper_left_of(self, offset, *coordinates, clicks=1,
+                              button='left', interval=0.0):
+        '''Clicks right of given location by given offset.
+
+        Example:
+        See argument documentation in `Click Above Of`.
+        '''
+        self.module.click_to_direction_of(Cardinal.upperleft,
+                                        CommonInput.validate_int(offset, MouseInputException.OffsetValue),
+                                        CommonInput.validate_int(clicks, MouseInputException.ClicksCount),
+                                        MouseInput.validate_button(button),
+                                        CommonInput.validate_float(interval, MouseInputException.IntervalValue),
+                                        MouseInput.validate_coordinates(coordinates))
+
+    @keyword
+    def click_lower_right_of(self, offset, *coordinates, clicks=1,
+                              button='left', interval=0.0):
+        '''Clicks right of given location by given offset.
+
+        Example:
+        See argument documentation in `Click Above Of`.
+        '''
+        self.module.click_to_direction_of(Cardinal.lowerright,
+                                        CommonInput.validate_int(offset, MouseInputException.OffsetValue),
+                                        CommonInput.validate_int(clicks, MouseInputException.ClicksCount),
+                                        MouseInput.validate_button(button),
+                                        CommonInput.validate_float(interval, MouseInputException.IntervalValue),
+                                        MouseInput.validate_coordinates(coordinates))
+
+    @keyword
+    def click_lower_left_of(self, offset, *coordinates, clicks=1,
+                              button='left', interval=0.0):
+        '''Clicks right of given location by given offset.
+
+        Example:
+        See argument documentation in `Click Above Of`.
+        '''
+        self.module.click_to_direction_of(Cardinal.lowerleft,
+                                        CommonInput.validate_int(offset, MouseInputException.OffsetValue),
+                                        CommonInput.validate_int(clicks, MouseInputException.ClicksCount),
+                                        MouseInput.validate_button(button),
+                                        CommonInput.validate_float(interval, MouseInputException.IntervalValue),
+                                        MouseInput.validate_coordinates(coordinates))
+
 
     @keyword
     def move_to(self, *coordinates, duration=0.0):
@@ -84,7 +148,8 @@ class MouseKeywords(object):
         that top left corner of the screen is (0, 0)
         for all valid coordinates see `Click` keyword
         '''
-        self.module.move_to(*coordinates, duration=duration)
+        self.module.move_to(MouseInput.validate_coordinates(coordinates),
+                            CommonInput.validate_float(duration, MouseInputException.DurationValue))
 
     @keyword
     def mouse_down_to(self, *coordinates, button='left'):
@@ -92,7 +157,8 @@ class MouseKeywords(object):
         Example:
         for all valid coordinates see `Click` keyword
         '''
-        self.module.down(*coordinates, button=button)
+        self.module.down(MouseInput.validate_coordinates(coordinates),
+                        button=MouseInput.validate_button(button))
 
     @keyword
     def mouse_up_to(self, *coordinates, button='left'):
@@ -100,7 +166,8 @@ class MouseKeywords(object):
         Example:
         for all valid coordinates see `Click` keyword
         '''
-        self.module.up(*coordinates, button=button)
+        self.module.up(MouseInput.validate_coordinates(coordinates),
+                       button=MouseInput.validate_button(button))
 
     @keyword
     def click_to(self, *coordinates, button='left'):
@@ -126,7 +193,8 @@ class MouseKeywords(object):
 
             | Click | 100,200 |
         '''
-        self.module.click(*coordinates, button=button)
+        self.module.click(MouseInput.validate_coordinates(coordinates),
+                          button=MouseInput.validate_button(button))
 
     @keyword
     def click_hold_to(self, time, *coordinates, button='left'):
@@ -137,7 +205,46 @@ class MouseKeywords(object):
             | Click Hold To   | 25 | 150 | 2 |
         for all valid coordinates see `Click` keyword
         '''
-        self.module.click_hold(*coordinates, time=time, button=button)
+        self.module.click_hold(MouseInput.validate_coordinates(coordinates),
+                               time=CommonInput.validate_float(time, MouseInputException.HoldTime),
+                               button=MouseInput.validate_button(button))
+
+    @keyword
+    def double_click_to(self, *coordinates, button='left', interval=0.0):
+        '''Double clicks with the specified mouse button.
+
+        See documentation of ``button`` in `Click`.
+
+        ``interval`` specifies the time between clicks and should be
+        floating point number.
+        for all valid coordinates see `Click` keyword
+        '''
+        self.module.double_click(MouseInput.validate_coordinates(coordinates),
+                            interval=CommonInput.validate_float(interval, MouseInputException.IntervalValue),
+                            button=MouseInput.validate_button(button))
+
+    @keyword
+    def triple_click_to(self, *coordinates, button='left', interval=0.0):
+        '''Triple clicks with the specified mouse button.
+
+        See documentation of ``button`` in `Click`.
+
+        See documentation of ``interval`` in `Double Click`.
+        for all valid coordinates see `Click` keyword
+        '''
+        self.module.triple_click(MouseInput.validate_coordinates(coordinates),
+                                interval=float(interval),
+                                button=MouseInput.validate_button(button))
+
+    @keyword
+    def scroll_to(self, amount, *coordinates):
+        '''sends mouse scroll to the given location either up if amount is positive
+        or down if the amount is negative.
+
+        for all valid coordinates see `Click` keyword
+        '''
+        self.module.scroll_to(MouseInput.validate_coordinates(coordinates),
+                            amount=CommonInput.validate_int(amount, MouseInputException.ScrollAmount))
 
     @keyword
     def drag_and_drop_to(self, *doublecoordinates, button='left', duration=0.0):
@@ -169,36 +276,6 @@ class MouseKeywords(object):
 
             | Drag And Drop To | x=100 | y=200 | x=300 | y=400 |
         '''
-        self.module.drag_and_drop(*doublecoordinates, button=button, duration=duration)
-
-    @keyword
-    def double_click_to(self, *coordinates, button='left', interval=0.0):
-        '''Double clicks with the specified mouse button.
-
-        See documentation of ``button`` in `Click`.
-
-        ``interval`` specifies the time between clicks and should be
-        floating point number.
-        for all valid coordinates see `Click` keyword
-        '''
-        self.module.double_click(*coordinates, interval=float(interval), button=button)
-
-    @keyword
-    def triple_click_to(self, *coordinates, button='left', interval=0.0):
-        '''Triple clicks with the specified mouse button.
-
-        See documentation of ``button`` in `Click`.
-
-        See documentation of ``interval`` in `Double Click`.
-        for all valid coordinates see `Click` keyword
-        '''
-        self.module.triple_click(*coordinates, interval=float(interval), button=button)
-
-    @keyword
-    def scroll_to(self, amount, *coordinates):
-        '''sends mouse scroll to the given location either up if amount is positive
-        or down if the amount is negative.
-
-        for all valid coordinates see `Click` keyword
-        '''
-        self.module.scroll_to(*coordinates, amount=amount)
+        self.module.drag_and_drop(MouseInput.validate_double_coordinates(doublecoordinates),
+                            button=MouseInput.validate_button(button),
+                            duration=CommonInput.validate_float(duration, MouseInputException.DurationValue))

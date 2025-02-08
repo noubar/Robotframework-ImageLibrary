@@ -8,7 +8,7 @@ class Keyboard:
     """
 
     @staticmethod
-    def press_keys(*keys, pause=0.0):
+    def press_keys(keys:list, pause=0.0):
         """Press given keyboard hotkeys (chars or keys).
 
         pause: time in seconds to wait between each key press
@@ -53,12 +53,11 @@ class Keyboard:
         0.0 by default, for no pause in between presses.
 
         """
-        valid_keys = Extras.validate_keys(keys)
-        pyautogui.hotkey(valid_keys, interval=pause)
+        pyautogui.hotkey(keys, interval=pause)
         return True
 
     @staticmethod
-    def press_and_hold(timeout, *keys, repeated=True):
+    def press_and_hold(timeout, keys:list, repeated=True):
         """press combination with a pause between each key press
         This can press any char or key on keyboard
         
@@ -70,8 +69,7 @@ class Keyboard:
         press combination in contrast to press and hold preses each key without releasing the previous one.
         See valid keyboard keys in `Press Combination`
         """
-        valid_keys = Extras.validate_keys(keys)
-        for key in valid_keys:
+        for key in keys:
             if repeated:
                 start_time = time()
                 while time() - start_time < float(timeout):
@@ -83,7 +81,7 @@ class Keyboard:
                 pyautogui.keyUp(key)
 
     @staticmethod
-    def press_and_hold_all(timeout, *keys, repeated=True):
+    def press_and_hold_all(timeout, keys:list, repeated=True):
         """press combination all together and hold for given time
         This can press any char or key on keyboard
         
@@ -95,38 +93,35 @@ class Keyboard:
         press keys in contrast to press and does not hold preses each key without releasing the previous one.
         See valid keyboard keys in `Press Keys`
         """
-        valid_keys = Extras.validate_keys(keys)
-        print(valid_keys)
         if repeated:
             start_time = time()
             while time() - start_time < float(timeout):
-                for key in valid_keys:
+                for key in keys:
                     pyautogui.keyDown(key)
-            for key in valid_keys:
+            for key in keys:
                 pyautogui.keyUp(key)
         else:
-            for key in valid_keys:
+            for key in keys:
                 pyautogui.keyDown(key)
             sleep(float(timeout))
-            for key in valid_keys:
+            for key in keys:
                 pyautogui.keyUp(key)
 
     @staticmethod
-    def type(*keys_or_text):
+    def type(keys_or_text:list):
         """Type text and keyboard keys.
-
+        expects 
+        [['key',true],['text',false],...]
+        example of input:
+        [['key',true],['text',false],...]
         See valid keyboard keys in `Press Combination`.
 
         """
-        for key_or_text in keys_or_text:
-            key = Extras.convert_to_valid_special_key(key_or_text, prefix=True)
-            if key:
-                pyautogui.press(key)
-            else:
-                pyautogui.typewrite(key_or_text)
+        for item in keys_or_text:
+            pyautogui.typewrite(item)
 
     @staticmethod
-    def type_with_keys_down(text, *keys):
+    def type_with_keys_down(text, keys:list):
         """Press keyboard keys down, then write given text, then release the
         keyboard keys. Which means Press and Hold all given keys and then release them all.
 
@@ -134,40 +129,10 @@ class Keyboard:
 
         Examples:
 
-        | Type with keys down | write this in caps  | Key.Shift |
+        | Type with keys down | write this in caps  | Shift |
         """
-        valid_keys = Extras.validate_keys(keys,prefix=True)
-        for key in valid_keys:
+        for key in keys:
             pyautogui.keyDown(key)
         pyautogui.typewrite(text)
-        for key in valid_keys:
-            pyautogui.keyUp(key)
-
-class Extras:
-    @staticmethod
-    def convert_to_valid_special_key(key, prefix=False):
-        """checks if the key is a valid keyboard key and return it in lowercase
-        if prefix is True, remove the 'key.' prefix from the key
-        """
-        key = str(key).lower()
-        if prefix:
-            if key.startswith('key.'):
-                key = key.split('key.', 1)[1]
-            elif len(key) > 1:
-                return None
-        if key in pyautogui.KEYBOARD_KEYS:
-            return key
-        return None
-
-    @staticmethod
-    def validate_keys(keys, prefix=False):
-        """validates the given keys and returns a list of valid keys
-        """
-        valid_keys = []
         for key in keys:
-            valid_key = Extras.convert_to_valid_special_key(key, prefix)
-            if not valid_key:
-                raise KeyboardException(f'Invalid keyboard key "{key}", valid '
-                                        f"keyboard keys are:\n{', '.join(pyautogui.KEYBOARD_KEYS)}")
-            valid_keys.append(valid_key)
-        return valid_keys
+            pyautogui.keyUp(key)
