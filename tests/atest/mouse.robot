@@ -2,7 +2,35 @@
 Resource    resources/common.robot
 
 
+*** Variables ***
+&{dict_coordinates}         x=100    y=200
+@{list_coordinates}         100    200
+${string_coordinates}       100,200
+${string_coordinates2}      100 ,200
+${string_coordinates3}      100, 200
+${string_coordinates4}      100 , 200
+
+
 *** Test Cases ***
+Test Clicking Using Different Coordinate Formats
+    [Documentation]    Validate different ways of passing coordinates to the Click keyword.
+    # Using a dictionary
+    Click To    ${dict_coordinates}
+    # Using a list
+    Click To    ${list_coordinates}
+    # Using a tuple
+    ${tuple_coordinates}    Evaluate    (100, 200)
+    Click To    ${tuple_coordinates}
+    # Passing coordinates directly
+    Click To    100    200
+    # Using named arguments
+    Click To    x=100    y=200
+    # Passing coordinates as a comma-separated string
+    Click To    ${string_coordinates}
+    Click To    ${string_coordinates2}
+    Click To    ${string_coordinates3}
+    Click To    ${string_coordinates4}
+
 Test Click
     # Launch Application    ${TEST_APP_PAINT}
     # Sleep    3

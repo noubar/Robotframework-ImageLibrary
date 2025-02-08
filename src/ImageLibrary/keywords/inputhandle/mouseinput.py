@@ -2,54 +2,79 @@ from enum import Enum
 from .inputerrors import MouseInputException
 
 class Cardinal(Enum):
+    """
+    Represents diagonal movement directions.
+    """
     upperleft = 0
     upperright = 1
     lowerright = 2
     lowerleft = 3
 
 class Orthogonal(Enum):
+    """
+    Represents straight (horizontal and vertical) movement directions.
+    """
     up = 0
     down = 1
     left = 2
     right = 3
 
 class MouseInput:
+    """
+    A utility class for validating and processing mouse input.
+    """
 
     @staticmethod
-    def validate_button(name):
+    def validate_button(name: str) -> str:
         """
-        Takes a string and returns a string.
-        all valid input output examples:
-            'left'
-            'middle'
-            'right' 
+        Validates the given mouse button name.
+
+        Args:
+            name (str): The name of the mouse button ('left', 'middle', or 'right').
+
+        Returns:
+            str: The validated mouse button name in lowercase.
+
+        Raises:
+            MouseInputException: If the provided button name is invalid.
         """
-        if name.lower() in ['left', 'middle', 'right']:
-            return name.lower()
+        name = name.lower()
+        if name in ['left', 'middle', 'right']:
+            return name
         else:
             raise MouseInputException.ButtonValue(name)
 
     @staticmethod
     def validate_double_coordinates(coordinates):
         """
-        Takes either tuple, list, or dictionary and returns a tuple of integers.
-        all valid input output examples:
-            ({'x': '100', 'y': '200'}, {'x': '300', 'y': '400'}) to ((100,200), (300,400))
-        	(['100', '200'], ['300', '400']) to ((100,200), (300,400))
-            ((100, 200), (300, 400)) to ((100,200), (300,400))
-            ('100', '200', '300', '400') to ((100,200), (300,400))
-            ('100,200', '100,200') to ((100,200), (100,200))
-            ('x=100', 'y=200', 'x=300', 'y=400') to ((100,200), (300,400))
-        examples are fed to validate_coordinates"""
+        Validates and converts different formats of coordinate pairs into a tuple of integer tuples.
+
+        Args:
+            coordinates: A tuple, list, dictionary, or string representation of coordinates.
+
+        Returns:
+            tuple: A tuple containing two coordinate pairs (x, y).
+
+        Raises:
+            MouseInputException: If the input format is invalid.
+        
+        All Valind Input Output Examples:
+            - ({'x': '100', 'y': '200'}, {'x': '300', 'y': '400'}) → ((100,200), (300,400))
+            - (['100', '200'], ['300', '400']) → ((100,200), (300,400))
+            - ((100, 200), (300, 400)) → ((100,200), (300,400))
+            - ('100', '200', '300', '400') → ((100,200), (300,400))
+            - ('100,200', '100,200') → ((100,200), (100,200))
+            - ('x=100', 'y=200', 'x=300', 'y=400') → ((100,200), (300,400))
+        """
         if isinstance(coordinates, (list, tuple)):
-            coords = ()
             if len(coordinates) == 2:
-                coords = (MouseInput.validate_coordinates((coordinates[0],)), MouseInput.validate_coordinates((coordinates[0],)))
+                return (MouseInput.validate_coordinates((coordinates[0],)),
+                          MouseInput.validate_coordinates((coordinates[1],)))
             elif len(coordinates) == 4:
-                coords = (MouseInput.validate_coordinates(coordinates[:2]), MouseInput.validate_coordinates(coordinates[2:]))
+                return (MouseInput.validate_coordinates(coordinates[:2]),
+                          MouseInput.validate_coordinates(coordinates[2:]))
             else:
                 raise MouseInputException.CoordinateCount(len(coordinates))
-            return coords
         else:
             raise MouseInputException.CoordinateType()
 
@@ -74,9 +99,9 @@ class MouseInput:
                 try:
                     coordinates = (coordinates['x'], coordinates['y'])
                 except KeyError:
-                    raise MouseInputException(f'Dictionary must have keys "x" and "y" but given was: {coordinates}') from None
+                    raise MouseInputException(
+                        f'Dictionary must have keys "x" and "y" but given was: {coordinates}') from None
             elif isinstance(coordinates, str):
-                print("iam in str")
                 coordinates = coordinates.split(',')
             elif len(coordinates) != 2:
                 raise MouseInputException.CoordinateCount(len(coordinates))

@@ -3,6 +3,12 @@ Library     Process
 Library     OperatingSystem
 
 
+*** Variables ***
+${EXP_WINDOW_TITLE}             FlaUI WPF Test App
+${WRONG_PID}                    99989
+${START_CMD_TEST_APP_WPF}       ${TEST_APP_WPF}
+
+
 *** Keywords ***
 Process Should Be Running
     [Arguments]    ${name}

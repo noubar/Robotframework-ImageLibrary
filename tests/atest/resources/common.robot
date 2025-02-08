@@ -22,12 +22,5 @@ ${KEYBOARD_HANDLE}      None
 
 
 *** Keywords ***
-Open Keyboard Test App
-    ${_status}    Run Keyword And Return Status    Process Should Be Running    name=KeyboardTestConsole
-    IF    ${_status}    RETURN
-    ${_handle}    Process.Start Process    ${TEST_APP_KEYBOARD}.exe
-    Set Global Variable    ${WPF_HANDLE}    ${_handle}
-    Process Should Be Running    name=KeyboardTestConsole
-
 Close Keyboard Test App
     Terminate Process    handle=${WPF_HANDLE}    kill=${True}
