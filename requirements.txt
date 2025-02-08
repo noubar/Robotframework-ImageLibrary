@@ -1,5 +1,6 @@
-robotframework
-pyautogui
-tk
-opencv-python
-scikit-image
+robotframework>=4.0
+robotframework-pythonlibcore>=4.0.0
+pyautogui==0.9.54
+opencv-python==4.11.0.86
+scikit-image==0.24.0
+psutil==6.1.1
