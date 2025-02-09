@@ -1,7 +1,7 @@
 from ..modules.interaction.mouse import Mouse
 from robot.api.deco import keyword
-from .inputhandle.mouseinput import Orthogonal, Cardinal, MouseInput
-from .inputhandle.commoninput import CommonInput
+from .inputhandle.mouseinput import MouseInput
+from .inputhandle.commoninput import CommonInput, Orthogonal, Cardinal
 from .inputhandle.inputerrors import MouseInputException
 
 class MouseKeywords(object):
@@ -12,7 +12,7 @@ class MouseKeywords(object):
     @keyword
     def click_above_of(self, offset, *coordinates, clicks=1,
                               button='left', interval=0.0):
-        '''Clicks above of given location by given offset.
+        '''Clicks above the given location by the given offset.
 
         ``coordinates`` can be any Python sequence type (tuple, list, etc.) that
         represents coordinates on the screen ie. have an x-value and y-value.
@@ -42,7 +42,7 @@ class MouseKeywords(object):
     @keyword
     def click_below_of(self, offset, *coordinates, clicks=1,
                               button='left', interval=0.0):
-        '''Clicks below of given location by given offset.
+        '''Clicks below the given location by the given offset.
 
         Example:
         See argument documentation in `Click Above Of`.
@@ -57,7 +57,7 @@ class MouseKeywords(object):
     @keyword
     def click_left_of(self, offset, *coordinates, clicks=1,
                              button='left', interval=0.0):
-        '''Clicks left of given location by given offset.
+        '''Clicks left of the given location by the given offset.
 
         Example:
         See argument documentation in `Click Above Of`.
@@ -72,7 +72,7 @@ class MouseKeywords(object):
     @keyword
     def click_upper_right_of(self, offset, *coordinates, clicks=1,
                               button='left', interval=0.0):
-        '''Clicks right of given location by given offset.
+        '''Clicks upper right (North East) of the given location by the given offset.
 
         Example:
         See argument documentation in `Click Above Of`.
@@ -87,7 +87,7 @@ class MouseKeywords(object):
     @keyword
     def click_upper_left_of(self, offset, *coordinates, clicks=1,
                               button='left', interval=0.0):
-        '''Clicks right of given location by given offset.
+        '''Clicks upper left (North West) of the given location by the given offset.
 
         Example:
         See argument documentation in `Click Above Of`.
@@ -102,7 +102,7 @@ class MouseKeywords(object):
     @keyword
     def click_lower_right_of(self, offset, *coordinates, clicks=1,
                               button='left', interval=0.0):
-        '''Clicks right of given location by given offset.
+        '''Clicks lower right (South East) of the given location by the given offset.
 
         Example:
         See argument documentation in `Click Above Of`.
@@ -117,7 +117,7 @@ class MouseKeywords(object):
     @keyword
     def click_lower_left_of(self, offset, *coordinates, clicks=1,
                               button='left', interval=0.0):
-        '''Clicks right of given location by given offset.
+        '''Clicks lower left (South West) of the given location by the given offset.
 
         Example:
         See argument documentation in `Click Above Of`.
@@ -153,7 +153,7 @@ class MouseKeywords(object):
 
     @keyword
     def mouse_down_to(self, *coordinates, button='left'):
-        '''Presses specidied mouse button down
+        '''Presses the specified mouse button down.
         Example:
         for all valid coordinates see `Click` keyword
         '''
@@ -162,7 +162,7 @@ class MouseKeywords(object):
 
     @keyword
     def mouse_up_to(self, *coordinates, button='left'):
-        '''Releases specified mouse button
+        '''Releases the specified mouse button.
         Example:
         for all valid coordinates see `Click` keyword
         '''
@@ -198,7 +198,7 @@ class MouseKeywords(object):
 
     @keyword
     def click_hold_to(self, time, *coordinates, button='left'):
-        '''Clicks with the specified mouse button.
+        '''Clicks and holds the specified mouse button.
         time is the time in seconds to hold the button down.
         Valid buttons are ``left``, ``right`` or ``middle``.
         Example:
@@ -238,7 +238,7 @@ class MouseKeywords(object):
 
     @keyword
     def scroll_to(self, amount, *coordinates):
-        '''sends mouse scroll to the given location either up if amount is positive
+        '''Sends mouse scroll to the given location either up if the amount is positive
         or down if the amount is negative.
 
         for all valid coordinates see `Click` keyword
@@ -248,7 +248,7 @@ class MouseKeywords(object):
 
     @keyword
     def drag_and_drop_to(self, *doublecoordinates, button='left', duration=0.0):
-        '''Clicks with the specified mouse button.
+        '''Drags and drops with the specified mouse button.
         time is the time in seconds to hold the button down.
         Valid buttons are ``left``, ``right`` or ``middle``.
         Example:

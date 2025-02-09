@@ -1,6 +1,6 @@
 import pyautogui as ag
 from robot.api import logger as LOGGER
-from ...keywords.inputhandle.mouseinput import Orthogonal, Cardinal
+from ...keywords.inputhandle.commoninput import Orthogonal, Cardinal
 
 ag.FAILSAFE = False
 

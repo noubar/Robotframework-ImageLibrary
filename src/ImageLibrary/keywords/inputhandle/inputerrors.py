@@ -1,24 +1,83 @@
 from pyautogui import KEYBOARD_KEYS
 
+class ScreenshotInputException(Exception):
+    """
+    ScreenshotInputException input error handler
+    """
+    @staticmethod
+    def AllScreensValue(x):
+        return ScreenshotInputException(f"Invalid if allscreens value '{x}',"
+                                        "it should be boolean.")
+
+class RecognitionInputException(Exception):
+    """
+    Image Recognition input error handler
+    """
+    @staticmethod
+    def StrategyValue(x):
+        return RecognitionInputException(f"Invalid strategy '{x}', valid strategies are: "
+                                   "'default' or 'pyautogui', 'edge' or 'skimage'.")
+
+    @staticmethod
+    def ConfidenceValue(x):
+        return RecognitionInputException(f"Invalid confidence value '{x}' "
+                                         "it should be a float number between 0 and 1.")
+
+    @staticmethod
+    def SigmaValue(x):
+        return RecognitionInputException(f"Invalid confidence value '{x}' "
+                                         "it should be a float number between 0 and 1.")
+
+    @staticmethod
+    def EdgeSigma(x):
+        return RecognitionInputException(f"Invalid skimage edge value '{x}' "
+                                         "it should be a float.")
+
+    @staticmethod
+    def LowThreshold(x):
+        return RecognitionInputException(f"Invalid low threshold edge value '{x}' "
+                                         "it should be a float number between 0 and 1.")
+
+    @staticmethod
+    def HighThreshold(x):
+        return RecognitionInputException(f"Invalid high threshold value '{x}' "
+                                         "it should be a float number between 0 and 1.")
+
+class OSInputException(Exception):
+    """
+    Operating System input error handler
+    """
+    @staticmethod
+    def LaunchPath(x):
+        return OSInputException(f"Invalid or non-existance path '{x}' to launch the application.")
+
+    @staticmethod
+    def ReferencePath(x):
+        return OSInputException(f"Invalid or non-existance path '{x}' to reference folder.")
+
+    @staticmethod
+    def ScreenshotPath(x):
+        return OSInputException(f"Invalid or non-existance path '{x}' to Screenshot folder.")
+
 class KeyboardInputException(Exception):
     """
-    Keybpard input error handler
+    Keyboard input error handler
     """
     @staticmethod
     def KeyInvalid(x):
-        return MouseInputException(f"Invalid keyboard key {x},"
+        return KeyboardInputException(f"Invalid keyboard key {x},"
                                    f"valid keyboard keys are:\n{', '.join(KEYBOARD_KEYS)}")
     @staticmethod
     def Pause(x):
-        return MouseInputException(f"Invalid pause time {x} it should be a float.")
+        return KeyboardInputException(f"Invalid pause time {x} it should be a float.")
 
     @staticmethod
     def HoldTime(x):
-        return MouseInputException(f"Invalid press and hold time {x} it should be a float.")
+        return KeyboardInputException(f"Invalid press and hold time {x} it should be a float.")
 
     @staticmethod
     def Repeated(x):
-        return MouseInputException(f"Invalid value for repeatedly pressing {x} "
+        return KeyboardInputException(f"Invalid value for repeatedly pressing {x} "
                                    "it should be a boolean.")
 
 class MouseInputException(Exception):
@@ -31,10 +90,10 @@ class MouseInputException(Exception):
 
     @staticmethod
     def CoordinateType():
-        return MouseInputException("Invalid type of coordinates. Please give either "
+        return MouseInputException("Invalid type of coordinates. Please provide either "
                             "string x,y or two integers x, y or a tuple of two integers (x, y) "
-                            "or a list of two integers [x, y]  or a dic {'x': x, 'y': y} "
-                            "or explicit valuse of 'x=value, y=value'.")
+                            "or a list of two integers [x, y] or a dict {'x': x, 'y': y} "
+                            "or explicit values of 'x=value, y=value'.")
 
     @staticmethod
     def CoordinateCount(x):

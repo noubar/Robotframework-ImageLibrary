@@ -48,14 +48,6 @@ class StrategyException(Exception):
         return (f'Invalid strategy: "{self.strategy}": '
         'it should be edge or default')
 
-class InvalidConfidenceValue(Exception):
-    def __init__(self, value):
-        self.value = value
-
-    def __str__(self):
-        return (f'The given confidence value "{self.value}" is invalid: '
-        'it should be a float number between 0 and 1')
-
 class InvalidAlias(Exception):
     def __init__(self, value):
         self.value = value

@@ -11,37 +11,26 @@ class RecognizeImagesKeywords(object):
         self.recognitions = recognitions
         self.copy = OperatingSystem(defaults, platform).copy
         self.recognizer = RecognizeImage(defaults, self.recognitions)
+        self.module = self.recognizer
 
     @keyword
-    def click_image(self, reference_image, additional_timeoute=0):
-        """Finds the reference image on screen and clicks it's center point once.
+    def click_image(self, reference_image, additional_timeout=0):
+        """Finds the reference image on screen and clicks its center point once.
 
         ``reference_image`` is automatically normalized as described in the
         `Reference image names`.
 
-        ``additional_timeoute`` optional value added to default timeout, in whole seconds. 
-            default is 0
+        ``additional_timeout`` optional value added to the default timeout, in whole seconds. 
+            default is 0 and can be set by library initiation (library import).
         """
-        timeout = self.recognitions.timeout + additional_timeoute
-        center_location = self.recognizer.wait_for(reference_image, timeout)
-        LOGGER.info(f'Clicking image "{reference_image}" in position {center_location}')
-        ag.click(center_location)
-        return center_location
+        timeout = self.recognitions.timeout + additional_timeout
+        self.module.click_image(reference_image, timeout)
 
-    def _click_to_the_direction_of(self, direction, location, offset, 
-                                   clicks, button, interval):
-        raise NotImplementedError('This is defined in the main class.')
-
-    def _locate_and_click_direction(self, direction, reference_image, offset,
-                                    clicks, button, interval, timeout):
-        location = self.recognizer.wait_for(reference_image, timeout)
-        self._click_to_the_direction_of(direction, location, offset, clicks,
-                                        button, interval)
 
     @keyword
-    def click_to_the_above_of_image(self, reference_image, offset, clicks=1,
-                                    button='left', interval=0.0, additional_timeoute=0):
-        """Clicks above of reference image by given offset.
+    def click_above_of_image(self, reference_image, offset, clicks=1,
+                                    button='left', interval=0.0, additional_timeout=0):
+        """Clicks above the reference image by given offset.
 
         See `Reference image names` for documentation for ``reference_image``.
 
@@ -52,46 +41,46 @@ class RecognizeImagesKeywords(object):
 
         ``timeout`` optional value, in whole seconds. default is 0
         """
-        timeout = self.recognitions.timeout + additional_timeoute
-        self._locate_and_click_direction('up', reference_image, offset,
+        timeout = self.recognitions.timeout + additional_timeout
+        self.module._locate_and_click_direction('up', reference_image, offset,
                                          clicks, button, interval, timeout)
 
     @keyword
-    def click_to_the_below_of_image(self, reference_image, offset, clicks=1,
-                                    button='left', interval=0.0, additional_timeoute=0):
-        """Clicks below of reference image by given offset.
+    def click_below_of_image(self, reference_image, offset, clicks=1,
+                                    button='left', interval=0.0, additional_timeout=0):
+        """Clicks below the reference image by given offset.
 
         See argument documentation in `Click To The Above Of Image`.
         """
-        timeout = self.recognitions.timeout + additional_timeoute
+        timeout = self.recognitions.timeout + additional_timeout
         self._locate_and_click_direction('down', reference_image, offset,
                                          clicks, button, interval, timeout)
 
     @keyword
-    def click_to_the_left_of_image(self, reference_image, offset, clicks=1,
-                                   button='left', interval=0.0, additional_timeoute=0):
-        """Clicks left of reference image by given offset.
+    def click_left_of_image(self, reference_image, offset, clicks=1,
+                                   button='left', interval=0.0, additional_timeout=0):
+        """Clicks left of the reference image by given offset.
 
         See argument documentation in `Click To The Above Of Image`.
         """
-        timeout = self.recognitions.timeout + additional_timeoute
+        timeout = self.recognitions.timeout + additional_timeout
         self._locate_and_click_direction('left', reference_image, offset,
                                          clicks, button, interval, timeout)
 
     @keyword
-    def click_to_the_right_of_image(self, reference_image, offset, clicks=1,
-                                    button='left', interval=0.0, additional_timeoute=0):
-        """Clicks right of reference image by given offset.
+    def click_right_of_image(self, reference_image, offset, clicks=1,
+                                    button='left', interval=0.0, additional_timeout=0):
+        """Clicks right of the reference image by given offset.
 
         See argument documentation in `Click To The Above Of Image`.
         """
-        timeout = self.recognitions.timeout + additional_timeoute
+        timeout = self.recognitions.timeout + additional_timeout
         self._locate_and_click_direction('right', reference_image, offset,
                                          clicks, button, interval, timeout)
 
     @keyword
-    def copy_from_the_above_of(self, reference_image, offset, additional_timeoute=0):
-        """Clicks three times above of reference image by given offset and
+    def copy_above_of_image(self, reference_image, offset, additional_timeout=0):
+        """Clicks three times above the reference image by given offset and
         copies.
 
         See `Reference image names` for documentation for ``reference_image``.
@@ -103,43 +92,43 @@ class RecognizeImagesKeywords(object):
 
         ``timeout`` optional value, in whole seconds. default is 0
         """
-        timeout = self.recognitions.timeout + additional_timeoute
+        timeout = self.recognitions.timeout + additional_timeout
         self._locate_and_click_direction('up', reference_image, offset,
                                          clicks=3, button='left', interval=0.0, timeout=timeout)
         return self.copy()
 
     @keyword
-    def copy_from_the_below_of(self, reference_image, offset, additional_timeoute=0):
-        """Clicks three times below of reference image by given offset and
+    def copy_below_of_image(self, reference_image, offset, additional_timeout=0):
+        """Clicks three times below the reference image by given offset and
         copies.
 
         See argument documentation in `Copy From The Above Of`.
         """
-        timeout = self.recognitions.timeout + additional_timeoute
+        timeout = self.recognitions.timeout + additional_timeout
         self._locate_and_click_direction('down', reference_image, offset,
                                          clicks=3, button='left', interval=0.0, timeout=timeout)
         return self.copy()
 
     @keyword
-    def copy_from_the_left_of(self, reference_image, offset, additional_timeoute=0):
-        """Clicks three times left of reference image by given offset and
+    def copy_left_of_image(self, reference_image, offset, additional_timeout=0):
+        """Clicks three times left of the reference image by given offset and
         copies.
 
         See argument documentation in `Copy From The Above Of`.
         """
-        timeout = self.recognitions.timeout + additional_timeoute
+        timeout = self.recognitions.timeout + additional_timeout
         self._locate_and_click_direction('left', reference_image, offset,
                                          clicks=3, button='left', interval=0.0, timeout=timeout)
         return self.copy()
 
     @keyword
-    def copy_from_the_right_of(self, reference_image, offset, additional_timeoute=0):
-        """Clicks three times right of reference image by given offset and
+    def copy_right_of_image(self, reference_image, offset, additional_timeout=0):
+        """Clicks three times right of the reference image by given offset and
         copies.
 
         See argument documentation in `Copy From The Above Of`.
         """
-        timeout = self.recognitions.timeout + additional_timeoute
+        timeout = self.recognitions.timeout + additional_timeout
         self._locate_and_click_direction('right', reference_image, offset,
                                          clicks=3, button='left', interval=0.0, timeout=timeout)
         return self.copy()
@@ -153,7 +142,7 @@ class RecognizeImagesKeywords(object):
         """
         # with self._suppress_keyword_on_failure():
         try:
-            return bool(self.recognizer.locate(reference_image, log_it=True))
+            return bool(self.module.locate(reference_image, log_it=True))
         except ImageNotOnScreenException:
             return False
 
@@ -163,9 +152,10 @@ class RecognizeImagesKeywords(object):
 
         Fails if image is not found on screen.
 
-        Returns Python tuple ``(x, y)`` of the coordinates matching the center point of the reference image.
+        Returns Python tuple ``(x, y)`` of the coordinates matching 
+        the center point of the reference image.
         """
-        return self.recognizer.locate(reference_image)
+        return self.module.locate(reference_image)
 
     @keyword
     def wait_for(self, reference_image, timeout=10):
@@ -181,7 +171,7 @@ class RecognizeImagesKeywords(object):
         Returns Python tuple ``(x, y)`` of the coordinates matching
         the center point of the reference image.
         """
-        self.recognizer.wait_for(reference_image, timeout)
+        self.module.wait_for(reference_image, timeout)
 
     @keyword
     def debug_image(self):

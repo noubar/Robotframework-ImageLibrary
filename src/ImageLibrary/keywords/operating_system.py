@@ -1,7 +1,8 @@
-from ..modules.interaction.os import OperatingSystem
-from robot.api.deco import keyword
-from robot.api import logger as LOGGER
 import os
+from robot.api.deco import keyword
+from .inputhandle.commoninput import CommonInput
+from .inputhandle.inputerrors import OSInputException
+from ..modules.interaction.os import OperatingSystem
 
 class OperatingSystemKeywords(object):
     """
@@ -65,10 +66,8 @@ class OperatingSystemKeywords(object):
 
         """
         name = name if name else os.path.basename(path)
-        path = os.path.abspath(path)
-        if not os.path.exists(path):
-            raise FileNotFoundError(f"The specified path does not exist: {path}")
-        self.module.launch_app(path, args, process_name=name, alias=alias, timeout=timeout)
+        self.module.launch_app(CommonInput.validate_path_exist(path,OSInputException.LaunchPath),
+                                args, process_name=name, alias=alias, timeout=timeout)
 
     @keyword
     def terminate_subprocess(self, alias=None, kill=False):

@@ -123,3 +123,19 @@ class RecognizeImage():
             raise ImageNotOnScreenException(reference_image)
         LOGGER.info(f'Image "{reference_image}" found at {location}')
         return location
+
+    def click_image(self, reference_image, timeout):
+        center_location = self.wait_for(reference_image, timeout)
+        LOGGER.info(f'Clicking image "{reference_image}" in position {center_location}')
+        ag.click(center_location)
+        return center_location
+
+    def _click_to_the_direction_of(self, direction, location, offset, 
+                                   clicks, button, interval):
+        raise NotImplementedError('This is defined in the main class.')
+
+    def _locate_and_click_direction(self, direction, reference_image, offset,
+                                    clicks, button, interval, timeout):
+        location = self.wait_for(reference_image, timeout)
+        self._click_to_the_direction_of(direction, location, offset, clicks,
+                                        button, interval)

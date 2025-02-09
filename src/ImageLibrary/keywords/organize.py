@@ -1,6 +1,8 @@
 from robot.api import logger as LOGGER
 from robot.api.deco import keyword
-from ..modules.errors import InvalidConfidenceValue
+from .inputhandle.recognitioninput import RecognitionInput
+from .inputhandle.commoninput import CommonInput
+from .inputhandle.inputerrors import OSInputException,RecognitionInputException
 
 class OrganizeKeywords:
     """
@@ -14,11 +16,11 @@ class OrganizeKeywords:
 
     @keyword
     def set_keyword_on_failure(self, keyword_on_failure):
-        """Sets keyword to be run, when location-related
-        keywords fail.
+        """Sets keyword to be run, when image library fails.
 
         This keyword might be used to temporarily diable screenshots, 
         then re-enable them later in the test.
+        This keyword does not check if the keyword exists.
 
         See `library importing` for he usage of keyword_on_failure.
         """
@@ -26,23 +28,33 @@ class OrganizeKeywords:
 
     @keyword
     def set_recognition_strategy(self, strategy):
-        """Sets keyword to be run, when location-related
-        keywords fail.
-
-        This keyword might be used to temporarily diable screenshots, 
-        then re-enable them later in the test.
-
-        See `library importing` for he usage of keyword_on_failure.
+        """Sets the strategy used for image recognition.
+        available strategies are 'pyautogui'='default' and 'skimage'='edge'.
         """
-        self.recognitions.strategy = strategy
+        self.recognitions.strategy = RecognitionInput.validate_strategy(strategy)
 
     @keyword
-    def set_reference_folder(self, reference_folder_path):
-        """Sets where all reference images are stored.
+    def set_edge_strategy_values(self, strategy):
+        """Sets the strategy used for image recognition.
+        available strategies are 'pyautogui'='default' and 'skimage'='edge'.
+        """
+        self.recognitions.strategy = RecognitionInput.validate_strategy(strategy)
+
+    @keyword
+    def set_reference_folder(self, edge_sigma=2.0, edge_low_threshold=0.1,
+                         edge_high_threshold=0.3,):
+        """Sets sigma low and high thresholds values needed by skimage.
+        Confidence can be set using `Set Confidence` keyword, which is used by 
+        both edge and default strategies.
 
         See `library importing` for format of the reference folder path.
         """
-        self.defaults.reference_folder = reference_folder_path
+        self.recognitions.edge_sigma =  CommonInput.validate_float(
+                                            edge_sigma, RecognitionInputException.EdgeSigma )
+        self.recognitions.edge_low_threshold =  CommonInput.validate_float_between(
+                                            edge_low_threshold, 0, 1, RecognitionInputException.LowThreshold )
+        self.recognitions.edge_high_threshold =  CommonInput.validate_float_between(
+                                            edge_high_threshold, 0, 1, RecognitionInputException.HighThreshold )
 
     @keyword
     def set_screenshot_folder(self, screenshot_folder_path):
@@ -50,14 +62,16 @@ class OrganizeKeywords:
 
         See `library importing` for more specific information.
         """
-        self.defaults.screenshot_folder = screenshot_folder_path
+        self.defaults.screenshot_folder = CommonInput.validate_path_exist(
+            screenshot_folder_path, OSInputException.ScreenshotPath)
 
     @keyword
     def reset_confidence(self):
         """Resets the confidence level to the library default.
-        If no confidence was given during import, then this equals to None."""
-        LOGGER.info(f'Resetting confidence level to {self.recognitions.initial_confidence}.')
+        If no confidence was given during import, then this equals to None.
+        """
         self.recognitions.confidence = self.recognitions.initial_confidence
+        LOGGER.info(f'Resetting confidence level to {self.recognitions.initial_confidence}.')
 
     @keyword
     def set_confidence(self, new_confidence):
@@ -68,17 +82,6 @@ class OrganizeKeywords:
         See `Confidence level` about additional dependencies that needs to be
         installed before this keyword has any effect.
         """
-        if new_confidence is not None:
-            try:
-                new_confidence = float(new_confidence)
-                if not 1 >= new_confidence >= 0:
-                    LOGGER.warn(f'Unable to set confidence to {new_confidence}. Value '
-                                'must be between 0 and 1, inclusive.')
-                    raise InvalidConfidenceValue(new_confidence)
-                else:
-                    self.recognitions.confidence = new_confidence
-            except TypeError as e:
-                LOGGER.warn(f"Can't set confidence to {new_confidence}")
-                raise(InvalidConfidenceValue(new_confidence)) from e
-        else:
-            self.recognitions.confidence = None
+        self.recognitions.confidence = CommonInput.validate_float_between(
+                                            new_confidence,0,1,RecognitionInputException.ConfidenceValue)
+        LOGGER.info(f'Confidence level set to {self.recognitions.confidence}.')

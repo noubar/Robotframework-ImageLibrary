@@ -6,8 +6,8 @@ from ..modules.interaction.keyboard import Keyboard
 
 class KeyboardKeywords:
     """
-    This keyword calss represents the keyboard keywords.
-    Trhrough this class you can use the keyboard interaction within your test cases.
+    This keyword class represents the keyboard keywords.
+    Through this class, you can use the keyboard interaction within your test cases.
 
     press keywords are used to press a single key or a combination of keys or chars.
     type keyword is used to type a string or a combination of keys and strings.
@@ -19,7 +19,7 @@ class KeyboardKeywords:
     @keyword
     def press_keys(self, *keys, pause=0.0):
         """Press given keyboard keys.
-        Keys and chars are only available, you can use `type` keyword for strings.
+        Keys and chars are only available, you can use the `type` keyword for strings.
         Keyboard keys are case-insensitive:
 
         pause: time in seconds to wait between each key press.
@@ -61,7 +61,7 @@ class KeyboardKeywords:
 
     @keyword
     def press_and_hold_together(self, time, *keys, repeated=True):
-        """Presses given all given keyboard chars or keys together for a given time.
+        """Presses all given keyboard chars or keys together for a given time.
 
         time: hold time in seconds in between each press.
         it keeps each key down for that time, then releases it to press and hold the next key.
@@ -83,7 +83,7 @@ class KeyboardKeywords:
 
     @keyword
     def type(self, *keys_or_text):
-        """Types text and keyboard keys. Both are possible
+        """Types text and keyboard keys. Both are possible.
         
         you need to defferentiate between text and keys by using 'Key.' prefix.
         keys are case-insensitive but text is case-sensitive.
@@ -100,7 +100,7 @@ class KeyboardKeywords:
 
     @keyword
     def type_with_keys_down(self, text, *keys):
-        """Press keyboard keys down, then write/type the given text, then release the
+        """Presses keyboard keys down, then writes/types the given text, then releases the
         keyboard keys. 
 
         this keyword takes one text or char but several keys

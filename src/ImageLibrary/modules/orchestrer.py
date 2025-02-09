@@ -90,7 +90,7 @@ class Orchesterer:
                 return False
 
             def platform_name(self):
-                """returns name of current paltform: windows, mac, linux, or None"""
+                """Returns name of current platform: windows, mac, linux, or None"""
                 name = None
                 if self.is_linux():
                     name = 'linux'
@@ -175,3 +175,4 @@ class Orchesterer:
         @staticmethod
         def _clean_invalid_windows_syntax(filename, special_characters="\"|%:/,.\\[]<>*?"):
             return ''.join([c for c in filename if c not in special_characters])
+

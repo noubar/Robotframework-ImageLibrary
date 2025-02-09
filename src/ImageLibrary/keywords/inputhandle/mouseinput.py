@@ -1,23 +1,5 @@
-from enum import Enum
 from .inputerrors import MouseInputException
 
-class Cardinal(Enum):
-    """
-    Represents diagonal movement directions.
-    """
-    upperleft = 0
-    upperright = 1
-    lowerright = 2
-    lowerleft = 3
-
-class Orthogonal(Enum):
-    """
-    Represents straight (horizontal and vertical) movement directions.
-    """
-    up = 0
-    down = 1
-    left = 2
-    right = 3
 
 class MouseInput:
     """
@@ -68,8 +50,8 @@ class MouseInput:
         """
         if isinstance(coordinates, (list, tuple)):
             if len(coordinates) == 2:
-                return (MouseInput.validate_coordinates((coordinates[0],)),
-                          MouseInput.validate_coordinates((coordinates[1],)))
+                return (MouseInput.validate_coordinates(coordinates[0],),
+                          MouseInput.validate_coordinates(coordinates[1],))
             elif len(coordinates) == 4:
                 return (MouseInput.validate_coordinates(coordinates[:2]),
                           MouseInput.validate_coordinates(coordinates[2:]))
