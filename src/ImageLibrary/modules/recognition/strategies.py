@@ -4,7 +4,7 @@ from skimage.io import imread, imsave
 import pyautogui
 import numpy as np
 from robot.api import logger as LOGGER
-from pyscreeze import ImageNotFoundException
+from pyautogui import ImageNotFoundException
 
 class _StrategySkimage():
     _SKIMAGE_DEFAULT_CONFIDENCE = 0.99
@@ -108,6 +108,7 @@ class _StrategyPyautogui():
         - locate_all=True:  None or list of location tuples (finds 0..n)
           (GUI Debugger mode)"""
         location = None
+        location_res = None
         if haystack_image is None:
             haystack_image = pyautogui.screenshot(allScreens=True)
         if locate_all:

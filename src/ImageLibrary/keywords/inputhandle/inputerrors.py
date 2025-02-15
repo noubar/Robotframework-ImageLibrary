@@ -42,6 +42,14 @@ class RecognitionInputException(Exception):
     def HighThreshold(x):
         return RecognitionInputException(f"Invalid high threshold value '{x}' "
                                          "it should be a float number between 0 and 1.")
+    @staticmethod
+    def ImageRef(x):
+        return RecognitionInputException(f"Invalid image reference Name '{x}', "
+                                         "it cannot be found under reference folder.")
+    @staticmethod
+    def Timeout(x):
+        return RecognitionInputException(f"Invalid timeout '{x}', "
+                                         "it sould be float.")
 
 class OSInputException(Exception):
     """

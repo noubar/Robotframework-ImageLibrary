@@ -14,7 +14,8 @@ class Mouse:
         """
         Clicks at a specified location in a given direction with a specified mouse button.
         Args:
-            direction (str): The direction to click towards (e.g., 'up', 'down', 'left', 'right').
+            direction (str): The direction to click towards (e.g., 'up', 'down', 'left', 'right',
+              'upperright', 'upperleft', 'lowerright', 'lowerleft').
             coordinates (tuple): The base location (x, y) from which the direction is calculated.
             offset (int): The offset distance from the base location in the specified direction.
             clicks (int): The number of times to click.

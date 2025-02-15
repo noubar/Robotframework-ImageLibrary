@@ -241,8 +241,9 @@ class ImageLibrary(DynamicCore):
           - ``edge_low_threshold`` - low pixel gradient threshold
           - ``edge_high_threshold`` - high pixel gradient threshold
 
-        ``recognition_timeout`` default timout in seconds for image recognition.
-          
+        ``recognition_timeout`` default timout in seconds for image recognition or minimum timoeut.
+        Available for all image recognition keywords excluding `Wait For`. 
+        But some keywords take their own additional timeout parameter which added to default (sum).
         """
         self.platform = Orchesterer.Platform()
         self.defaults = Orchesterer.Defaults(reference_folder, keyword_on_failure)
@@ -254,7 +255,7 @@ class ImageLibrary(DynamicCore):
                     MouseKeywords(),
                     ScreenshotKeywords(self.screenshots),
                     OperatingSystemKeywords(self.defaults, self.platform),
-                    RecognizeImagesKeywords(self.defaults, self.platform, self.recognitions),
+                    RecognizeImagesKeywords(self.defaults, self.recognitions),
                     OrganizeKeywords(self.defaults, self.platform, self.recognitions, self.screenshots)
                     ]
         self.builtin = BuiltIn()

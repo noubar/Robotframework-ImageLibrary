@@ -1,8 +1,3 @@
-class ExceptionBuilder:
-    def __init__(self, exception: type[Exception], message: str, *args):
-        formatted_message = message.format(*args)
-        raise exception(formatted_message)
-    
 class ImageLibraryError(ImportError):
     pass
 
@@ -10,12 +5,15 @@ class LibraryImportError(ImportError):
     pass
 
 class ImageNotOnScreenException(Exception):
-    def __init__(self, image_name):
-        self.image_name = image_name
 
-    def __str__(self):
-        return f'Reference image "{self.image_name}" was not found on screen'
+    @staticmethod
+    def NotOnScreen(x):
+        return ImageNotOnScreenException(f'Reference image "{x}" was not found on screen')
 
+    @staticmethod
+    def NotOnScreenAfterWait(x,y):
+        return ImageNotOnScreenException(f'Reference image "{x}" was not found on screen '
+                                         f'after waiting for the given timeout of "{y}" seconds.')
 
 class InvalidImageException(Exception):
     pass
