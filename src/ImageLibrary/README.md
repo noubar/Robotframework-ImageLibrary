@@ -1,4 +1,35 @@
 # Code Architecture Overview
+## File Structure
+
+The file structure of the project is as follows:
+
+```
+/Robotframework-ImageLibrary/src/ImageLibrary/
+├── modules/
+│   ├── interaction/
+│   │   ├── __init__.py
+│   │   ├── *.py (All Modules)
+│   ├── recognition/
+│   │   ├── __init__.py
+│   │   ├── images.py 
+│   │   └── ImageDebugger/
+│   │       ├── __init__.py
+│   │       └── *.py (image debuging related modules)
+│   ├── __init__.py
+│   ├── errors.py
+│   └── orchestrator.py
+├── keywords/
+│   ├── inputhandle/
+│   │   ├── __init__.py
+│   │   ├── *.py (input handler of all Modules)
+│   ├── __init__.py
+│   ├── keyboard.py
+│   ├── mouse.py
+│   ├── operating_system.py
+│   ├── organize.py
+│   ├── recognize_images.py
+│   └── screenshot.py
+```
 
 **The codebase is organized into two primary folders:**
 

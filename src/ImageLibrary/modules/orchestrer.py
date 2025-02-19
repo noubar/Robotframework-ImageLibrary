@@ -2,9 +2,9 @@ from collections import OrderedDict
 from platform import platform
 from os.path import isdir
 from subprocess import call
+import pyautogui
 from .errors import ReferenceFolderException, StrategyException
 from .recognition.strategies import _StrategyPyautogui, _StrategySkimage
-
 
 
 class Orchesterer:
@@ -120,8 +120,14 @@ class Orchesterer:
             self.needle_edge = None
             self.haystack_edge = None
             self.peakmap = None
+            self.pixel_ratio = None
             self.set_strategy(strategy, edge_sigma, edge_low_threshold,
                               edge_high_threshold, confidence)
+            self.set_pixel_ratio()
+
+        def set_pixel_ratio(self):
+            """ Sets the pixel ratio for the current screen. """
+            self.pixel_ratio = pyautogui.screenshot().size[0]/pyautogui.size().width
 
         def set_strategy(self, strategy, edge_sigma=2.0, edge_low_threshold=0.1,
                          edge_high_threshold=0.3, confidence=0.99):
